@@ -1,4 +1,5 @@
-function a = convex_area_estimator(path)
+function [a,bw] = convex_area_estimator(path)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
 % 
@@ -27,8 +28,6 @@ SE  = strel('Disk',3,4);
 bw = imclose(bw, SE);
 bw = imfill(bw,'holes');
 bw = bwareafilt(bw,1);
-
-imshow(bw)
 
 s = regionprops(bw,'ConvexArea');
 a = s(1).ConvexArea;
