@@ -23,3 +23,4 @@ clc;
 
 perc_whole = 100*(est_half/est_total)
 perc_broken = 100*(est_half_broken/est_total)
+perc_broken_ref = 100*perc_broken/perc_whole
