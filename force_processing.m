@@ -10,6 +10,7 @@ function [force,max_force] = force_processing(path)
 % Last Updated: 03.21.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 % Change the current folder to the folder of this m-file.
 if(~isdeployed)
   cd(fileparts(which(mfilename)));
