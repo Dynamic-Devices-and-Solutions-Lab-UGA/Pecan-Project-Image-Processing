@@ -15,8 +15,9 @@ iter = size(files,1);
 
 plot_m = zeros(5000,iter);
 
-for i = 1:4
+for i = 1:iter
     plot_m(:,i) = force_processing(fullfile('Acceleration_and_Force_Data',files(i).name));
     plot(plot_m(:,i))
+    hold on
 end
 

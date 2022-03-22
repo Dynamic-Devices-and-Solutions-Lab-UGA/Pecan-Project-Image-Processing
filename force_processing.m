@@ -1,4 +1,4 @@
-function [force] = force_processing(path)
+function [force,max_force] = force_processing(path)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -22,8 +22,19 @@ workspace;  % Make sure the workspace panel is showing.
 currentFolder = pwd;
 FullFileName = fullfile(currentFolder,path);
 
-% TDMS_Struct = TDMS_getStruct('C:\Users\dnagr\OneDrive\Desktop\Agramonte, Dani Enrique\6. DDSL\14. Master''s Research\4. Pecan Project Image Processing\Acceleration_and_Force_Data\pec.id.340-imp.60-hold.60-mass.448.42-converted.tdms')
-
 TDMS_Struct = TDMS_getStruct(FullFileName);
-force = TDMS_Struct.unnamedTask_5_.Dev2_1_ai1.data;
+names = fieldnames(TDMS_Struct);
+force = getfield(TDMS_Struct,names{2},'Dev2_1_ai1','data');
+
+% error handling if force is empty
+if isempty(force)
+    force = zeros(5000,1);
+    warning('%s has no force data and should be deleted',...
+        TDMS_Struct.Props.name)
+end
+
+max_force = max(force);
+
+
+    
 

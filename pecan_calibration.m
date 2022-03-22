@@ -20,7 +20,7 @@ if(~isdeployed)
 end
 
 % calibration constant
-calib_constant = 36.3;
+calib_constant = 9.4;
 
 % calibrate values
 if param == true
