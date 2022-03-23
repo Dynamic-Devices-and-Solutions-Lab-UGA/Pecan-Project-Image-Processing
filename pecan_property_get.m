@@ -1,4 +1,4 @@
-function [area,length,width,bw] = pecan_property_get(path)
+function [area,length,width,bounding_box,bw] = pecan_property_get(path)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -16,6 +16,9 @@ workspace;  % Make sure the workspace panel is showing.
 
 % read image from file
 I = imread(path);
+
+% crop image
+I = imcrop(I,[1480 730 830 570]);
 
 % initially binarize image
 X = imbinarize(I);
@@ -42,5 +45,11 @@ area = pecan_calibration(s(1).ConvexArea,'area');
 
 % find length and width of pecan
 dims = pecan_calibration(s(1).BoundingBox,'distance');
-length = max(dims);
-width = min(dims);
+
+% remove shift in box
+dims = dims(3:4);
+length = min(dims);
+width = max(dims);
+
+% bounding box info in terms of pixels
+bounding_box = s(1).BoundingBox;
