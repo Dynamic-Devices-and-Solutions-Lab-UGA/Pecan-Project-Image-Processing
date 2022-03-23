@@ -11,11 +11,6 @@ function [force,max_force] = force_processing(path)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Change the current folder to the folder of this m-file.
-if(~isdeployed)
-  cd(fileparts(which(mfilename)));
-end
-
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 

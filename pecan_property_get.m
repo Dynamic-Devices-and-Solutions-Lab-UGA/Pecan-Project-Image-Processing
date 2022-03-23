@@ -11,20 +11,11 @@ function [area,length,width,bw] = pecan_property_get(path)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Change the current folder to the folder of this m-file.
-if(~isdeployed)
-  cd(fileparts(which(mfilename)));
-end
-
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
-% construct full path
-currentFolder = pwd;
-FullFileName = fullfile(currentFolder,path);
-
 % read image from file
-I = imread(FullFileName);
+I = imread(path);
 
 % initially binarize image
 X = imbinarize(I);

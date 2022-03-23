@@ -14,11 +14,6 @@ function calib = pecan_calibration(val,varargin)
 % parse inputs into function
 [x, param] = parseinputs(val,varargin);
 
-% Change the current folder to the folder of this m-file.
-if(~isdeployed)
-  cd(fileparts(which(mfilename)));
-end
-
 % calibration constant
 calib_constant = 9.4;
 
