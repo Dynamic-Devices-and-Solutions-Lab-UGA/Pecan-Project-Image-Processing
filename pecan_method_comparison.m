@@ -12,9 +12,17 @@ clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
+% The following is for full half comparison
+%{
 % Get pre crack files
 pre_crack_files = dir(fullfile(fullfile(pwd,...
     'Pecan_Data_03.24.22/Pre_Crack'), '*.jpg'));
+pre_crack_files = [pre_crack_files; dir(fullfile(fullfile(pwd,...
+    'Pecan_Data_03.31.22_Test_Full_Halves/Pre_Crack'), '*.jpg'))];
+%}
+% The following is for partial half comparison
+pre_crack_files = dir(fullfile(fullfile(pwd,...
+    'Pecan_Data_03.31.22_Test_Partial_Halves/Pre_Crack'), '*.jpg'));
 
 % number of pecans to consider
 n_pecan_pre_crack = length(pre_crack_files);
@@ -28,9 +36,19 @@ for i = 1:n_pecan_pre_crack
         pre_crack_files(i).name,'_','.'));
 end
 
+
+% The following is for full half comparison
+%{
 % Get post crack files
 post_crack_files = dir(fullfile(fullfile(pwd,...
     'Pecan_Data_03.24.22/Post_Crack'), '*.jpg'));
+post_crack_files = [post_crack_files; dir(fullfile(fullfile(pwd,...
+    'Pecan_Data_03.31.22_Test_Full_Halves/Post_Crack'), '*.jpg'))];
+%}
+
+% The following is for partial half comparison
+post_crack_files = dir(fullfile(fullfile(pwd,...
+    'Pecan_Data_03.31.22_Test_Partial_Halves/Post_Crack'), '*.jpg'));
 
 % number of full halves to consider
 n_pecan_post_crack = length(post_crack_files);
@@ -87,7 +105,7 @@ for i = 1:n_pecan_post_crack
         pre_crack_files(pre_crack_ind).name);
     
     [pecan_method_comp(i,1),~,~] = PHE(pre_crack_file,post_crack_file,...
-        'method','bounding_box');
+        'method','bounding_box','pre_cracked_bw','true');
 end
 
 % use direct area method

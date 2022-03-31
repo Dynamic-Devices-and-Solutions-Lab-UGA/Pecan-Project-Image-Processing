@@ -17,8 +17,20 @@ workspace;  % Make sure the workspace panel is showing.
 % read image from file
 I = imread(path);
 
+% get image dimensions
+im_dims = size(I);
+
+if (im_dims(1) == 1960)&&(im_dims(2) == 4032)
+    % you're good!
+elseif (im_dims(2) == 1960)&&(im_dims(1) == 4032)
+    I = permute(I,[2 1 3]);
+else
+    error('pecan_property_get:image is not correctly size');
+end
+
 % crop image
-I = imcrop(I,[1480 730 830 570]);
+I = imcrop(I,[1480 730 1250 600]);
+
 
 % initially binarize image
 X = imbinarize(I);
