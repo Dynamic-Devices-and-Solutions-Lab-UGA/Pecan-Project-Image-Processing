@@ -20,7 +20,7 @@ FullFileName = fullfile(currentFolder,path);
 
 TDMS_Struct = TDMS_getStruct(FullFileName);
 names = fieldnames(TDMS_Struct);
-force = getfield(TDMS_Struct,names{2},'Dev2_1_ai1','data');
+force = getfield(TDMS_Struct,names{2},'Dev2_1_ai0','data');
 
 % error handling if force is empty
 if isempty(force)
