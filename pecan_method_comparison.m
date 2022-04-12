@@ -13,6 +13,7 @@ clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
 % The following is for full half comparison
+
 %{
 % Get pre crack files
 pre_crack_files = dir(fullfile(fullfile(pwd,...
@@ -20,9 +21,11 @@ pre_crack_files = dir(fullfile(fullfile(pwd,...
 pre_crack_files = [pre_crack_files; dir(fullfile(fullfile(pwd,...
     'Pecan_Data_03.31.22_Test_Full_Halves/Pre_Crack'), '*.jpg'))];
 %}
+
 % The following is for partial half comparison
 pre_crack_files = dir(fullfile(fullfile(pwd,...
     'Pecan_Data_03.31.22_Test_Partial_Halves/Pre_Crack'), '*.jpg'));
+
 
 % number of pecans to consider
 n_pecan_pre_crack = length(pre_crack_files);
@@ -38,6 +41,7 @@ end
 
 
 % The following is for full half comparison
+
 %{
 % Get post crack files
 post_crack_files = dir(fullfile(fullfile(pwd,...
@@ -46,9 +50,11 @@ post_crack_files = [post_crack_files; dir(fullfile(fullfile(pwd,...
     'Pecan_Data_03.31.22_Test_Full_Halves/Post_Crack'), '*.jpg'))];
 %}
 
+
 % The following is for partial half comparison
 post_crack_files = dir(fullfile(fullfile(pwd,...
     'Pecan_Data_03.31.22_Test_Partial_Halves/Post_Crack'), '*.jpg'));
+
 
 % number of full halves to consider
 n_pecan_post_crack = length(post_crack_files);

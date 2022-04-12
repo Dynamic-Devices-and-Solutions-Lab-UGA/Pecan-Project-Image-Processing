@@ -1,4 +1,5 @@
-function [area,length,width,bounding_box,bw] = pecan_property_get(path)
+function [area,pec_length,pec_width,bounding_box,bw] = pecan_property_get(path,...
+    varargin)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -7,12 +8,24 @@ function [area,length,width,bounding_box,bw] = pecan_property_get(path)
 % image
 %
 % Author: Dani Agramonte
-% Last Updated: 03.15.22
+% Last Updated: 04.11.22
+%
+% Inputs
+% ---------------
+% path                 : path of image. must be an absolute path
+% varargin             : optional inputs (see explanation)
+% 
+% Optional Inputs
+% ---------------
+% debug_bw             : go into debug mode. show binary image. takes true
+%                        or false values. false by default
+% bounding_box         : turn bounding box around all images on. takes true
+%                        or false values. false by default
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clc;  % Clear command window.
-workspace;  % Make sure the workspace panel is showing.
+% parse inputs with auxiliary function
+[path,params] = parseinputs(path,varargin{:});
 
 % read image from file
 I = imread(path);
@@ -23,13 +36,15 @@ im_dims = size(I);
 if (im_dims(1) == 1960)&&(im_dims(2) == 4032)
     % you're good!
 elseif (im_dims(2) == 1960)&&(im_dims(1) == 4032)
+    % reshuffle dimensions to their correct values
     I = permute(I,[2 1 3]);
 else
+    % dimensions aren't compatible with what is expected from the camera
     error('pecan_property_get:image is not correctly size');
 end
 
 % crop image
-I = imcrop(I,[1480 730 1250 600]);
+I = imcrop(I,[1500 150 1500 950]);
 
 
 % initially binarize image
@@ -60,8 +75,89 @@ dims = pecan_calibration(s(1).BoundingBox,'distance');
 
 % remove shift in box
 dims = dims(3:4);
-length = min(dims);
-width = max(dims);
+pec_length = min(dims);
+pec_width = max(dims);
 
 % bounding box info in terms of pixels
 bounding_box = s(1).BoundingBox;
+
+if params.pre_cracked_bw
+    figure
+    imshow(bw)
+    
+    if params.bounding_box
+        hold on
+        rectangle('Position',bounding_box,'EdgeColor','b')
+    end
+end
+
+
+%-----------END MAIN FUNCTION-----------%
+
+function [path,params] = parseinputs(path,varargin)
+% PARSEINPUTS: ensure that paths are strings, and parse user parameters
+
+% Check if paths are strings or not
+if ~(ischar(path))
+    error('Input paths must be strings!')
+end
+
+% Parse property/value pairs
+if rem(length(varargin), 2) ~= 0
+    error('pecan_property_get:InvalidInputArguments', ...
+        'Additional arguments must take the form of Property/Value pairs')
+end
+
+% Cell array of valid property names
+valid_properties = {'debug_bw','bounding_box'};
+
+% Set default values
+params.debug_bw = 0;
+params.bounding_box = 0;
+
+while ~isempty(varargin)
+    % Pop pair off varargin
+    property = varargin{1};
+    value = varargin{2};
+    varargin(1:2) = [];
+    
+    % If the property has been supplied in a shortened form, lengthen it
+    iProperty = find(strncmpi(property, valid_properties, length(property)));
+    if isempty(iProperty)
+        error('pecan_property_get:UnknownProperty', 'Unknown Property');
+    elseif length(iProperty) > 1
+        error('pecan_property_get:AmbiguousProperty', ...
+            'Supplied shortened property name is ambiguous');
+    end
+    
+    % Expand property to its full name
+    property = valid_properties{iProperty};
+        
+    % Check supplied property value
+    switch property
+        case 'debug_bw'
+            switch value
+                case 'true'
+                    params.pre_cracked_bw = 1;
+                case 'false'
+                    params.pre_cracked_bw = 0;
+                otherwise
+                    error('pecan_property_get:InvalidValue',...
+                        'pre_cracked_bw must be either ''true'' or ''false''');
+            end
+        case 'bounding_box'
+            switch value
+                case 'true'
+                    params.bounding_box = 1;
+                case 'false'
+                    params.bounding_box = 0;
+                otherwise
+                    error('pecan_property_get:InvalidValue',...
+                        'bounding_box must be either ''true'' or ''false''');
+            end
+    end % switch property
+end % while
+
+end % parseinputs
+
+end

@@ -121,12 +121,12 @@ function [pre_crack_path,post_crack_path,params] = parseinputs(pre_crack_path,..
 
 % Check if paths are strings or not
 if ~(ischar(pre_crack_path)&&ischar(post_crack_path))
-    error('input paths must be strings!')
+    error('Input paths must be strings!')
 end
 
 % Parse property/value pairs
 if rem(length(varargin), 2) ~= 0
-    error('PHE_m2:InvalidInputArguments', ...
+    error('PHE:InvalidInputArguments', ...
         'Additional arguments must take the form of Property/Value pairs')
 end
 
@@ -148,9 +148,9 @@ while ~isempty(varargin)
     % If the property has been supplied in a shortened form, lengthen it
     iProperty = find(strncmpi(property, valid_properties, length(property)));
     if isempty(iProperty)
-        error('PHE_m2:UnknownProperty', 'Unknown Property');
+        error('PHE:UnknownProperty', 'Unknown Property');
     elseif length(iProperty) > 1
-        error('PHE_m2:AmbiguousProperty', ...
+        error('PHE:AmbiguousProperty', ...
             'Supplied shortened property name is ambiguous');
     end
     
@@ -166,7 +166,7 @@ while ~isempty(varargin)
                 case 'false'
                     params.pre_cracked_bw = 0;
                 otherwise
-                    error('PHE_m2:InvalidValue',...
+                    error('PHE:InvalidValue',...
                         'pre_cracked_bw must be either ''true'' or ''false''');
             end
         case 'post_cracked_bw'
@@ -176,7 +176,7 @@ while ~isempty(varargin)
                 case 'false'
                     params.post_cracked_bw = 0;
                 otherwise
-                    error('PHE_m2:InvalidValue',...
+                    error('PHE:InvalidValue',...
                         'post_cracked_bw must be either ''true'' or ''false''');
             end
         case 'bounding_box'
@@ -186,7 +186,7 @@ while ~isempty(varargin)
                 case 'false'
                     params.bounding_box = 0;
                 otherwise
-                    error('PHE_m2:InvalidValue',...
+                    error('PHE:InvalidValue',...
                         'bounding_box must be either ''true'' or ''false''');
             end
         case 'method'
