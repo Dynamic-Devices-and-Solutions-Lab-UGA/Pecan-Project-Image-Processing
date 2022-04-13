@@ -18,6 +18,7 @@ calib_constant_force = 0.489e-3; % [V/g]
 calib_constant_accel = 0.0577e-3; % [V/N]
 
 % calibrate values
+
 if param == true
     calib = x./calib_constant_force;
 else

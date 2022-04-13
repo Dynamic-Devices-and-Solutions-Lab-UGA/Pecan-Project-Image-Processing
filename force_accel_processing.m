@@ -1,4 +1,4 @@
-function [force,max_force] = force_processing(path)
+function [force,accel,max_force,max_accel] = force_accel_processing(path)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -7,7 +7,7 @@ function [force,max_force] = force_processing(path)
 % force data
 %
 % Author: Dani Agramonte
-% Last Updated: 03.21.22
+% Last Updated: 04.12.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -18,9 +18,16 @@ workspace;  % Make sure the workspace panel is showing.
 currentFolder = pwd;
 FullFileName = fullfile(currentFolder,path);
 
-TDMS_Struct = TDMS_getStruct(FullFileName);
+% try to get the structure with a relative path, then an absolute path
+try
+    TDMS_Struct = TDMS_getStruct(FullFileName);
+catch
+    TDMS_Struct = TDMS_getStruct(path);
+end
+
 names = fieldnames(TDMS_Struct);
 force = getfield(TDMS_Struct,names{2},'Dev2_1_ai0','data');
+accel = getfield(TDMS_Struct,names{2},'Dev2_1_ai1','data');
 
 % error handling if force is empty
 if isempty(force)
@@ -30,6 +37,7 @@ if isempty(force)
 end
 
 max_force = max(force);
+max_accel = max(accel);
 
 
     

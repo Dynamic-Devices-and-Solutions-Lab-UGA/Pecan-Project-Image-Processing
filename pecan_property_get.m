@@ -81,7 +81,7 @@ pec_width = max(dims);
 % bounding box info in terms of pixels
 bounding_box = s(1).BoundingBox;
 
-if params.pre_cracked_bw
+if params.debug_bw
     figure
     imshow(bw)
     
