@@ -38,9 +38,9 @@ function [x, param] = parseinputs(x,varargin)
 if size(x, 1) == 1
     x = x'; 
 end
-if size(x, 2) ~= 1
+if size(x, 2) ~= 2
     error('pecan_calibration:InvalidDimension', ...
-        'Input matrix must be one dimensional')
+        'Input matrix must be N-by-2')
 end
 
 % Determine if we are calibrating to force or acceleration

@@ -26,9 +26,18 @@ clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
-%% load in existing structure to append to it
+%% Prepare MATLAB
 
-load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat')
+%load in existing structure to append to it if it exists
+if exist('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','file')
+    load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat')
+end
+
+% checks to see if tdms function is in current MATLAB path and adds it if
+% it isn't in that path
+if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms')
+    addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
+end
 
 
 %% load in data and initialize/preallocate arrays for force processing
@@ -42,13 +51,12 @@ n_force_files = length(force_files);
 
 % initialize and preallocate
 pecan_test_metadata = cell(n_force_files,1);
-pecan_test_time = cell(n_force_files,1);
+pecan_test_time = zeros(n_force_files,1);
 
 % get metadata for all force files
 for i = 1:n_force_files
-    pecan_test_metadata(i) = {force_files(i).name(1:48)};
-    %pecan_test_metadata(i) = {force_files(i).name(17:64)};
-    %pecan_test_time(i) = time_unix(force_files(i).name(1:15));
+    pecan_test_metadata(i) = {force_files(i).name(17:64)};
+    pecan_test_time(i) = time_unix(force_files(i).name(1:15));
 end
 
 % get unique values 
