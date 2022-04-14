@@ -1,6 +1,13 @@
 # Windows default autosave extension
 *.asv
 
+# Ignore image data
+*.jpg
+
+# Ignore TDMS data
+*.tdms
+*.tdms_index
+
 # OSX / *nix default autosave extension
 *.m~
 

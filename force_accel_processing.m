@@ -26,8 +26,10 @@ catch
 end
 
 names = fieldnames(TDMS_Struct);
-force = getfield(TDMS_Struct,names{2},'Dev2_1_ai0','data');
-accel = getfield(TDMS_Struct,names{2},'Dev2_1_ai1','data');
+force = force_accel_calibration(getfield(TDMS_Struct,names{2},...
+    'Dev2_1_ai0','data'),'force');
+accel = force_accel_calibration(getfield(TDMS_Struct,names{2},...
+    'Dev2_1_ai1','data'),'acceleration');
 
 % error handling if force is empty
 if isempty(force)

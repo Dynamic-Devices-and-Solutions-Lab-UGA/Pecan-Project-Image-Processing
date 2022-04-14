@@ -4,10 +4,32 @@
 % Create data structure with all the important properties about a given
 % pecan test run including metadata, test parameters, and results.
 %
+%
+% TO DO:
+% 1. Change how force files are processed to accomodate new file naming
+% convention and to handle to handle the fact that the order of tests won't
+% comply with ASCII ordering
+% 2. save structure as a .mat file in a predicted location and delete all
+% other variables to prevent clutter in the workspace
+% 3. add a pre-processing component in the beginning to load existing
+% structure in .mat form and append new data to it
+% 4. add code to check that data going into structure seems correct/was
+% collected correctly - especially for image processing stuff
+%
 % Author: Dani Agramonte
 % Last Updated: 04.12.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Initialize MATLAB
+clear; % Clear variables
+clc;  % Clear command window.
+workspace;  % Make sure the workspace panel is showing.
+
+%% load in existing structure to append to it
+
+load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat')
+
 
 %% load in data and initialize/preallocate arrays for force processing
 
@@ -20,10 +42,13 @@ n_force_files = length(force_files);
 
 % initialize and preallocate
 pecan_test_metadata = cell(n_force_files,1);
+pecan_test_time = cell(n_force_files,1);
 
 % get metadata for all force files
 for i = 1:n_force_files
     pecan_test_metadata(i) = {force_files(i).name(1:48)};
+    %pecan_test_metadata(i) = {force_files(i).name(17:64)};
+    %pecan_test_time(i) = time_unix(force_files(i).name(1:15));
 end
 
 % get unique values 
@@ -161,7 +186,9 @@ for i = 1:size(pecan_test_meta_data_unique,1)
         % initialize indexing variable
         k = 1;
         while true
-            try
+            % check to see if ind is in bounds 
+            if all_pre_crack_ind_i(j)+k <= n_pecan_pre_crack...
+                    +n_pecan_post_crack+ n_pecan_uncracked+n_pecan_diseased
                 % figure out what the next image is
                 ind = I_sort(all_pre_crack_ind_i(j)+k);
                 
@@ -214,7 +241,7 @@ for i = 1:size(pecan_test_meta_data_unique,1)
                     break
                 else
                 end
-            catch
+            else
                 break
             end
         end
@@ -223,7 +250,14 @@ for i = 1:size(pecan_test_meta_data_unique,1)
     I_config_size_running_sum = I_config_size_running_sum+I_config_size(i);
 end
 
-%-----------END MAIN FUNCTION-----------%
+% save data structure
+save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','pecan_data_struct')
+
+clearvars -except pecan_data_struct; % Clear variables
+clc;  % Clear command window.
+workspace;  % Make sure the workspace panel is showing.
+
+%-----------END MAIN SCTIPT-----------%
 
 function [metadata] = parsemetadata(val)
 % parsemetadata: get metadata from 
