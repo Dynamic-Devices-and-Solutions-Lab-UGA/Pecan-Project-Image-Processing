@@ -12,7 +12,7 @@
 % 2. save structure as a .mat file in a predicted location and delete all
 % other variables to prevent clutter in the workspace - DONE
 % 3. add a pre-processing component in the beginning to load existing
-% structure in .mat form and append new data to it
+% structure in .mat form and append new data to it - DONE
 % 4. add code to check that data going into structure seems correct/was
 % collected correctly - especially for image processing stuff
 % 5. figure out what fields to put in for nonstandard pecan cracking
@@ -24,15 +24,19 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialize MATLAB
+tic; % begin timing script
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
-%% Prepare MATLAB
+%% Post-Initialize MATLAB
 
-%load in existing structure to append to it if it exists
+%load in existing structure to append to it if it exists and create flag if
+%it does exist
+params.pecan_data_struct_preexist = 0;
 if exist('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','file')
     load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat')
+    params.pecan_data_struct_preexist = 1;
 end
 
 % checks to see if tdms function is in current MATLAB path and adds it if
@@ -66,6 +70,15 @@ if(~isdeployed)
   cd(fileparts(which(mfilename)));
 end
 
+%% obtain data from pecan_data_struct if it exists
+
+if params.pecan_data_struct_preexist
+    % unix timestamp for final force in existing struct
+    [~,force_final_name] = fileparts(pecan_data_struct(end).test(end).accelforce.file);
+    final_data_existing_timestamp = time_unix(force_final_name(1:15));
+end
+
+
 %% load in data and initialize/preallocate arrays for force processing
 
 % get force files
@@ -79,28 +92,31 @@ n_force_files = length(force_files);
 pecan_test_metadata = cell(n_force_files,1);
 pecan_test_time = zeros(n_force_files,1);
 
+% calculate existing end index
+force_end_ind = 0;
+
 % get metadata for all force files
 for i = 1:n_force_files
     pecan_test_metadata(i) = {force_files(i).name(17:64)};
-    
-    % reformat string because LabVIEW prepended date as MMDDYYYY instead of
-    % YYYYMMDD as expected
-    string_reformat = append(force_files(i).name(5:8),...
-        force_files(i).name(1:4),force_files(i).name(1:15));
-    string_reformat(9:15) = [];
-    pecan_test_time(i) = time_unix(string_reformat);
+    pecan_test_time(i) = time_unix(force_files(i).name(1:15));
 end
 
 % get unique values 
-[pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,'stable');
-
+[pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,...
+    'stable');
 
 % initialize matrix with info about number of tests in each configuration
 I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
 
 % create pecan_data_struct and loop through number of testing 
 % configurations
-for i = 1:size(pecan_test_meta_data_unique,1)
+for i = 1:(size(pecan_test_meta_data_unique,1))
+    % check to see if data has been loaded
+    if params.pecan_data_struct_preexist
+        if pecan_test_time(i_meta_data(i)) <= final_data_existing_timestamp
+            continue
+        end
+    end
     
     % get metadata from each configuration
     metadata = parsemetadata(pecan_test_meta_data_unique(i));
@@ -125,6 +141,8 @@ for i = 1:size(pecan_test_meta_data_unique,1)
         pecan_data_struct(i).test(j).accelforce.accel = accel;
         pecan_data_struct(i).test(j).accelforce.maxforce = max_force;
         pecan_data_struct(i).test(j).accelforce.maxaccel = max_accel;
+        pecan_data_struct(i).test(j).accelforce.file = fullfile(...
+            force_files(I_config(j)).folder,force_files(I_config(j)).name);
     end
 end
 
@@ -208,7 +226,15 @@ end
 % initialize sum of I_config_size
 I_config_size_running_sum = 0;
 
-for i = 1:size(pecan_test_meta_data_unique,1)
+for i = 1:(size(pecan_test_meta_data_unique,1))
+    
+    % continue if the data has already been logged in the .mat file
+    if params.pecan_data_struct_preexist
+        if pecan_test_time(i_meta_data(i)) <= final_data_existing_timestamp
+            I_config_size_running_sum = I_config_size_running_sum+I_config_size(i);
+            continue
+        end
+    end
     
     % find pre crack indices in sorted list
     all_pre_crack_ind_i = find(sum(I_sort == ...
@@ -222,7 +248,7 @@ for i = 1:size(pecan_test_meta_data_unique,1)
         % get and store pre crack file
         pecan_data_struct(i).test(j).pre_crack_data.file = fullfile(...
         pre_crack_files(pre_crack_ind).folder,...
-        pre_crack_files(pre_crack_ind).name);
+        pre_crack_files(pre_crack_ind).name); %#ok<SAGROW>
     
         % initialize indexing variable
         k = 1;
@@ -291,12 +317,16 @@ for i = 1:size(pecan_test_meta_data_unique,1)
     I_config_size_running_sum = I_config_size_running_sum+I_config_size(i);
 end
 
+%% finalization
+
 % save data structure
 save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','pecan_data_struct')
-
 clearvars -except pecan_data_struct; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
+
+% finish timing of script
+elapsed_time = toc;
 
 %-----------END MAIN SCTIPT-----------%
 
