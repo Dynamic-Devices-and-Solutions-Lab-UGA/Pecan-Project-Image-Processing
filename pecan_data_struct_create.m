@@ -8,13 +8,15 @@
 % TO DO:
 % 1. Change how force files are processed to accomodate new file naming
 % convention and to handle to handle the fact that the order of tests won't
-% comply with ASCII ordering
+% comply with ASCII ordering - DONE
 % 2. save structure as a .mat file in a predicted location and delete all
-% other variables to prevent clutter in the workspace
+% other variables to prevent clutter in the workspace - DONE
 % 3. add a pre-processing component in the beginning to load existing
 % structure in .mat form and append new data to it
 % 4. add code to check that data going into structure seems correct/was
 % collected correctly - especially for image processing stuff
+% 5. figure out what fields to put in for nonstandard pecan cracking
+% outcomes. 
 %
 % Author: Dani Agramonte
 % Last Updated: 04.12.22
@@ -39,6 +41,30 @@ if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms')
     addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
 end
 
+% ======================================================================= %
+% Turn off note "Warning: Added specified worksheet." that appears in the 
+% command window. To set the warning state, you must first know the 
+% message identifier for the one warning you want to enable. 
+% Query the last warning to acquire the identifier.  
+% 
+% For example: 
+% warnStruct = warning('query', 'last');
+% msgid_integerCat = warnStruct.identifier
+% 
+% Command window will show this:
+% msgid_integerCat =
+%    MATLAB:xlswrite:AddSheet
+% 
+% You need to pass the expression with the colons in it into the warning() 
+% function.
+%
+% Turn off note "Warning: Added specified worksheet." that appears in the 
+% command window.
+% ======================================================================= %
+
+if(~isdeployed)
+  cd(fileparts(which(mfilename)));
+end
 
 %% load in data and initialize/preallocate arrays for force processing
 
@@ -56,11 +82,18 @@ pecan_test_time = zeros(n_force_files,1);
 % get metadata for all force files
 for i = 1:n_force_files
     pecan_test_metadata(i) = {force_files(i).name(17:64)};
-    pecan_test_time(i) = time_unix(force_files(i).name(1:15));
+    
+    % reformat string because LabVIEW prepended date as MMDDYYYY instead of
+    % YYYYMMDD as expected
+    string_reformat = append(force_files(i).name(5:8),...
+        force_files(i).name(1:4),force_files(i).name(1:15));
+    string_reformat(9:15) = [];
+    pecan_test_time(i) = time_unix(string_reformat);
 end
 
 % get unique values 
-pecan_test_meta_data_unique = unique(pecan_test_metadata);
+[pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,'stable');
+
 
 % initialize matrix with info about number of tests in each configuration
 I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
@@ -84,8 +117,8 @@ for i = 1:size(pecan_test_meta_data_unique,1)
         
         % capture force and accel time histories as well as max force/accel
         [force,accel,max_force,max_accel] = force_accel_processing(...
-            fullfile(force_files(I_config(j+1)).folder,...
-            force_files(I_config(j+1)).name));
+            fullfile(force_files(I_config(j)).folder,...
+            force_files(I_config(j)).name));
         
         % store data in struct
         pecan_data_struct(i).test(j).accelforce.force = force;
@@ -196,7 +229,7 @@ for i = 1:size(pecan_test_meta_data_unique,1)
         while true
             % check to see if ind is in bounds 
             if all_pre_crack_ind_i(j)+k <= n_pecan_pre_crack...
-                    +n_pecan_post_crack+ n_pecan_uncracked+n_pecan_diseased
+                    +n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased
                 % figure out what the next image is
                 ind = I_sort(all_pre_crack_ind_i(j)+k);
                 

@@ -40,7 +40,3 @@ end
 
 max_force = max(force);
 max_accel = max(accel);
-
-
-    
-
