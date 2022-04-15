@@ -163,12 +163,9 @@ end
 % initialize matrix with info about number of tests in each configuration
 I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
 
-% initialize structure
-pecan_data_struct(size(pecan_test_meta_data_unique,1)) = struct();
-
 % create pecan_data_struct and loop through number of testing 
 % configurations
-for i = 1:(size(pecan_test_meta_data_unique,1))
+for i = (size(pecan_test_meta_data_unique,1)):-1:1
     % check to see if data has been loaded
     if params.pecan_data_struct_preexist
         if pecan_test_time(i_meta_data(i)) <= final_data_existing_timestamp
