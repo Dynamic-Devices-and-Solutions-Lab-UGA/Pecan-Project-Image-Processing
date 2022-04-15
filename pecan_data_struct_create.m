@@ -12,7 +12,7 @@
 % 2. save structure as a .mat file in a predicted location and delete all
 % other variables to prevent clutter in the workspace - DONE
 % 3. add a pre-processing component in the beginning to load existing
-% structure in .mat form and append new data to it - DONE
+% structure in .mat form and append new data to it - DONE  
 % 4. add code to check that data going into structure seems correct/was
 % collected correctly - especially for image processing stuff
 % 5. figure out what fields to put in for nonstandard pecan cracking
@@ -43,6 +43,12 @@ end
 % it isn't in that path
 if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms')
     addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
+end
+
+% checks to see if GetFileTime is in current MATLAB path and adds it if it
+% isn't in that path
+if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\FileTime')
+    addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\FileTime'))
 end
 
 % set path of where data is located
@@ -493,6 +499,10 @@ save(fullfile(data_path,'pecan_data_struct.mat'),'pecan_data_struct')
 clearvars -except pecan_data_struct; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
+
+% remove unnecessary paths for path cleaning
+rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms');
+rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\FileTime');
 
 % finish timing of script
 elapsed_time = toc;
