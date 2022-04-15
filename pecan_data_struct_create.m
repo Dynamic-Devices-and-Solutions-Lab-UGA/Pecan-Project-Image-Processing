@@ -45,6 +45,9 @@ if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms')
     addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
 end
 
+% set path of where data is located
+data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster';
+
 % ======================================================================= %
 % Turn off note "Warning: Added specified worksheet." that appears in the 
 % command window. To set the warning state, you must first know the 
@@ -78,12 +81,64 @@ if params.pecan_data_struct_preexist
     final_data_existing_timestamp = time_unix(force_final_name(1:15));
 end
 
+%% get all subfolders in PecanDataMaster
+
+% get all folder contents
+all_PecanDataMaster_contents = dir(data_path);
+
+% remove files
+PecanDataMaster_folders = all_PecanDataMaster_contents(...
+    [all_PecanDataMaster_contents(:).isdir]);
+
+% remove '.' and '..'
+PecanDataMaster_folders = PecanDataMaster_folders(...
+    ~ismember({PecanDataMaster_folders(:).name},{'.','..'}));
+
+% empty array of values indicating if the file is an image file
+isforcefile = zeros(size(PecanDataMaster_folders,1),1);
+
+% determine if file is force or image file
+for i = 1:size(PecanDataMaster_folders,1)
+    isforcefile(i) = strcmp(...
+        PecanDataMaster_folders(i).name(20:end),'converted');
+end
+
 
 %% load in data and initialize/preallocate arrays for force processing
 
 % get force files
-force_files = dir(fullfile(fullfile(pwd,...
-    'PecanDataMaster','PecanData-converted'), '*.tdms'));
+% get size of pre crack file structure
+n_force_files = sum(isforcefile);
+
+% get indices where force files is nonzero
+force_file_ind = find(isforcefile);
+
+% running sum of size of each subfolder
+fc_files_running_sum = 0;
+
+% build structure of force files
+for i = n_force_files:-1:1
+    % files for iteration
+    fc_iter_files = dir(fullfile(...
+        pwd,...
+        'PecanDataMaster',...
+        PecanDataMaster_folders(force_file_ind(i)).name,'*.tdms'));
+    
+    % n files for iteration
+    n_fc_iter_files = size(fc_iter_files,1);
+    
+    % force iteration start index
+    fc_iter_si = 1+fc_files_running_sum;
+    
+    % force iteration end index
+    fc_iter_ei = fc_iter_si+n_fc_iter_files-1;
+    
+    % assign files to structure
+    force_files(fc_iter_si:fc_iter_ei) = fc_iter_files;
+    
+    % update running sum
+    fc_files_running_sum = fc_files_running_sum+n_fc_iter_files;
+end
 
 % number of force files
 n_force_files = length(force_files);
@@ -108,6 +163,9 @@ end
 % initialize matrix with info about number of tests in each configuration
 I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
 
+% initialize structure
+pecan_data_struct(size(pecan_test_meta_data_unique,1)) = struct();
+
 % create pecan_data_struct and loop through number of testing 
 % configurations
 for i = 1:(size(pecan_test_meta_data_unique,1))
@@ -120,7 +178,7 @@ for i = 1:(size(pecan_test_meta_data_unique,1))
     
     % get metadata from each configuration
     metadata = parsemetadata(pecan_test_meta_data_unique(i));
-    pecan_data_struct(i).metadata = metadata; %#ok<SAGROW>
+    pecan_data_struct(i).metadata = metadata;
     
     % index for given configuration
     I_config = find(ismember(pecan_test_metadata,...
@@ -148,8 +206,40 @@ end
 
 %% get precrack files
 
-pre_crack_files = dir(fullfile(fullfile(pwd,...
-    'PecanDataMaster','PecanData-images/Pre_Crack'), '*.jpg'));
+% get pre crack files
+% get size of pre crack file structure
+n_image_files = sum(~isforcefile);
+
+% get indices where force files is nonzero
+image_file_ind = find(~isforcefile);
+
+% running sum of size of each subfolder
+pc_files_running_sum = 0;
+
+% build structure of pre crack files
+for i = n_image_files:-1:1
+    % files for iteration
+    pc_iter_files = dir(fullfile(...
+        pwd,...
+        'PecanDataMaster',...
+        PecanDataMaster_folders(image_file_ind(i)).name,...
+        'Pre_Crack','*.jpg'));
+    
+    % n files for iteration
+    n_pc_iter_files = size(pc_iter_files,1);
+    
+    % pre crack iteration start index
+    pc_iter_si = 1+pc_files_running_sum;
+    
+    % pre_crack_iteration end index
+    pc_iter_ei = pc_iter_si+n_pc_iter_files-1;
+    
+    % assign files to structure
+    pre_crack_files(pc_iter_si:pc_iter_ei) = pc_iter_files;
+    
+    % update running sum
+    pc_files_running_sum = pc_files_running_sum+n_pc_iter_files;
+end
 
 % number of pecans to consider
 n_pecan_pre_crack = length(pre_crack_files);
@@ -163,8 +253,35 @@ for i = 1:n_pecan_pre_crack
 end
 
 %% get postcrack files
-post_crack_files = dir(fullfile(fullfile(pwd,...
-    'PecanDataMaster','PecanData-images/Post_Crack'), '*.jpg'));
+
+% get post crack files
+% running sum of size of each subfolder
+poc_files_running_sum = 0;
+
+% build structure of post crack files
+for i = n_image_files:-1:1
+    % files for iteration
+    poc_iter_files = dir(fullfile(...
+        pwd,...
+        'PecanDataMaster',...
+        PecanDataMaster_folders(image_file_ind(i)).name,...
+        'Post_Crack','*.jpg'));
+    
+    % n files for iteration
+    n_poc_iter_files = size(poc_iter_files,1);
+    
+    % post crack iteration start index
+    poc_iter_si = 1+poc_files_running_sum;
+    
+    % post_crack_iteration end index
+    poc_iter_ei = poc_iter_si+n_poc_iter_files-1;
+    
+    % assign files to structure
+    post_crack_files(poc_iter_si:poc_iter_ei) = poc_iter_files;
+    
+    % update running sum
+    poc_files_running_sum = poc_files_running_sum+n_poc_iter_files;
+end
 
 % number of pecans to consider
 n_pecan_post_crack = length(post_crack_files);
@@ -178,8 +295,35 @@ for i = 1:n_pecan_post_crack
 end
 
 %% get uncracked files
-uncracked_files = dir(fullfile(fullfile(pwd,...
-    'PecanDataMaster','PecanData-images/Uncracked'), '*.jpg'));
+
+% get uncracked files
+% running sum of size of each subfolder
+uc_files_running_sum = 0;
+
+% build structure of uncracked files
+for i = n_image_files:-1:1
+    % files for iteration
+    uc_iter_files = dir(fullfile(...
+        pwd,...
+        'PecanDataMaster',...
+        PecanDataMaster_folders(image_file_ind(i)).name,...
+        'Uncracked','*.jpg'));
+    
+    % n files for iteration
+    n_uc_iter_files = size(uc_iter_files,1);
+    
+    % uncracked iteration start index
+    uc_iter_si = 1+uc_files_running_sum;
+    
+    % uncracked iteration end index
+    uc_iter_ei = uc_iter_si+n_uc_iter_files-1;
+    
+    % assign files to structure
+    uncracked_files(uc_iter_si:uc_iter_ei) = uc_iter_files;
+    
+    % update running sum
+    uc_files_running_sum = uc_files_running_sum+n_uc_iter_files;
+end
 
 % number of pecans to consider
 n_pecan_uncracked = length(uncracked_files);
@@ -193,8 +337,35 @@ for i = 1:n_pecan_uncracked
 end
 
 %% get diseased files
-diseased_files = dir(fullfile(fullfile(pwd,...
-    'PecanDataMaster','PecanData-images/Diseased'), '*.jpg'));
+
+% get diseased files
+% running sum of size of each subfolder
+dd_files_running_sum = 0;
+
+% build structure of diseased files
+for i = n_image_files:-1:1
+    % files for iteration
+    dd_iter_files = dir(fullfile(...
+        pwd,...
+        'PecanDataMaster',...
+        PecanDataMaster_folders(image_file_ind(i)).name,...
+        'Diseased','*.jpg'));
+    
+    % n files for iteration
+    n_dd_iter_files = size(dd_iter_files,1);
+    
+    % diseased iteration start index
+    dd_iter_si = 1+dd_files_running_sum;
+    
+    % diseased iteration end index
+    dd_iter_ei = dd_iter_si+n_dd_iter_files-1;
+    
+    % assign files to structure
+    diseased_files(dd_iter_si:dd_iter_ei) = dd_iter_files;
+    
+    % update running sum
+    dd_files_running_sum = dd_files_running_sum+n_dd_iter_files;
+end
 
 % number of pecans to consider
 n_pecan_diseased = length(diseased_files);
@@ -231,7 +402,8 @@ for i = 1:(size(pecan_test_meta_data_unique,1))
     % continue if the data has already been logged in the .mat file
     if params.pecan_data_struct_preexist
         if pecan_test_time(i_meta_data(i)) <= final_data_existing_timestamp
-            I_config_size_running_sum = I_config_size_running_sum+I_config_size(i);
+            I_config_size_running_sum = ...
+                I_config_size_running_sum+I_config_size(i);
             continue
         end
     end
@@ -248,7 +420,7 @@ for i = 1:(size(pecan_test_meta_data_unique,1))
         % get and store pre crack file
         pecan_data_struct(i).test(j).pre_crack_data.file = fullfile(...
         pre_crack_files(pre_crack_ind).folder,...
-        pre_crack_files(pre_crack_ind).name); %#ok<SAGROW>
+        pre_crack_files(pre_crack_ind).name);
     
         % initialize indexing variable
         k = 1;
@@ -320,7 +492,7 @@ end
 %% finalization
 
 % save data structure
-save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','pecan_data_struct')
+save(fullfile(data_path,'pecan_data_struct.mat'),'pecan_data_struct')
 clearvars -except pecan_data_struct; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
