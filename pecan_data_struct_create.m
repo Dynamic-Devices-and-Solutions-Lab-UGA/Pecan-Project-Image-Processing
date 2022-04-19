@@ -524,7 +524,18 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                         <= ind)&&((n_pecan_pre_crack+...
                         n_pecan_post_crack+n_pecan_uncracked) >= ind))
                     
-                    pecan_data_struct(i).test(j).post_crack_data = [];
+                    % calculate uncracked ind
+                    uncracked_ind = ind-n_pecan_pre_crack-n_pecan_post_crack;
+                    
+                    % get file and store in structure
+                    pecan_data_struct(i).test(j).post_crack_data.file = ...
+                        fullfile(uncracked_files(uncracked_ind).folder,...
+                        uncracked_files(uncracked_ind).name);
+                    
+                    % populate rest of structure
+                    pecan_data_struct(i).test(j).post_crack_data.perc = 0;
+                    pecan_data_struct(i).test(j).post_crack_data.post_crack_area = 0;
+                    
                     pecan_data_struct(i).test(j).result(k-1) = ...
                         {'Unsuccessful Crack'};
                     break
@@ -532,7 +543,15 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                         n_pecan_uncracked+1) <= ind)&&((...
                         n_pecan_pre_crack+n_pecan_post_crack+...
                         n_pecan_uncracked+n_pecan_diseased) >= ind))
-                    pecan_data_struct(i).test(j).post_crack_data = [];
+                    
+                    % calculate diseased ind
+                    diseased_ind = ind-n_pecan_pre_crack-n_pecan_post_crack-n_pecan_uncracked;
+                    
+                    % get file and store in structure
+                    pecan_data_struct(i).test(j).post_crack_data.file = ...
+                        fullfile(diseased_files(diseased_ind).folder,...
+                        diseased_files(diseased_ind).name);
+                    
                     pecan_data_struct(i).test(j).result(k-1) = ...
                         {'Diseased Pecan'};
                     break
