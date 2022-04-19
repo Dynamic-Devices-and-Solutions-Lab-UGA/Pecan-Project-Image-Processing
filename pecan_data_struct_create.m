@@ -34,7 +34,7 @@ workspace;  % Make sure the workspace panel is showing.
 %load in existing structure to append to it if it exists and create flag if
 %it does exist
 params.pecan_data_struct_preexist = 0;
-if exist('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','file')
+if exist('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat','file')~=0
     load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster\pecan_data_struct.mat')
     params.pecan_data_struct_preexist = 1;
 end
@@ -43,12 +43,6 @@ end
 % it isn't in that path
 if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms')
     addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
-end
-
-% checks to see if GetFileTime is in current MATLAB path and adds it if it
-% isn't in that path
-if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\FileTime')
-    addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\FileTime'))
 end
 
 % set path of where data is located
@@ -90,6 +84,7 @@ end
 %% get all subfolders in PecanDataMaster
 
 % get all folder contents
+
 all_PecanDataMaster_contents = dir(data_path);
 
 % remove files
@@ -107,104 +102,6 @@ isforcefile = zeros(size(PecanDataMaster_folders,1),1);
 for i = 1:size(PecanDataMaster_folders,1)
     isforcefile(i) = strcmp(...
         PecanDataMaster_folders(i).name(20:end),'converted');
-end
-
-
-%% load in data and initialize/preallocate arrays for force processing
-
-% get force files
-% get size of pre crack file structure
-n_force_files = sum(isforcefile);
-
-% get indices where force files is nonzero
-force_file_ind = find(isforcefile);
-
-% running sum of size of each subfolder
-fc_files_running_sum = 0;
-
-% build structure of force files
-for i = n_force_files:-1:1
-    % files for iteration
-    fc_iter_files = dir(fullfile(...
-        pwd,...
-        'PecanDataMaster',...
-        PecanDataMaster_folders(force_file_ind(i)).name,'*.tdms'));
-    
-    % n files for iteration
-    n_fc_iter_files = size(fc_iter_files,1);
-    
-    % force iteration start index
-    fc_iter_si = 1+fc_files_running_sum;
-    
-    % force iteration end index
-    fc_iter_ei = fc_iter_si+n_fc_iter_files-1;
-    
-    % assign files to structure
-    force_files(fc_iter_si:fc_iter_ei) = fc_iter_files;
-    
-    % update running sum
-    fc_files_running_sum = fc_files_running_sum+n_fc_iter_files;
-end
-
-% number of force files
-n_force_files = length(force_files);
-
-% initialize and preallocate
-pecan_test_metadata = cell(n_force_files,1);
-pecan_test_time = zeros(n_force_files,1);
-
-% calculate existing end index
-force_end_ind = 0;
-
-% get metadata for all force files
-for i = 1:n_force_files
-    pecan_test_metadata(i) = {force_files(i).name(17:64)};
-    pecan_test_time(i) = time_unix(force_files(i).name(1:15));
-end
-
-% get unique values 
-[pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,...
-    'stable');
-
-% initialize matrix with info about number of tests in each configuration
-I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
-
-% create pecan_data_struct and loop through number of testing 
-% configurations
-for i = (size(pecan_test_meta_data_unique,1)):-1:1
-    % check to see if data has been loaded
-    if params.pecan_data_struct_preexist
-        if pecan_test_time(i_meta_data(i)) <= final_data_existing_timestamp
-            continue
-        end
-    end
-    
-    % get metadata from each configuration
-    metadata = parsemetadata(pecan_test_meta_data_unique(i));
-    pecan_data_struct(i).metadata = metadata;
-    
-    % index for given configuration
-    I_config = find(ismember(pecan_test_metadata,...
-        pecan_test_meta_data_unique(i)));
-    
-    I_config_size(i) = size(I_config,1)-1;
-    
-    % loop through number of tests in each configuration
-    for j = 1:(size(I_config,1)-1)
-        
-        % capture force and accel time histories as well as max force/accel
-        [force,accel,max_force,max_accel] = force_accel_processing(...
-            fullfile(force_files(I_config(j)).folder,...
-            force_files(I_config(j)).name));
-        
-        % store data in struct
-        pecan_data_struct(i).test(j).accelforce.force = force;
-        pecan_data_struct(i).test(j).accelforce.accel = accel;
-        pecan_data_struct(i).test(j).accelforce.maxforce = max_force;
-        pecan_data_struct(i).test(j).accelforce.maxaccel = max_accel;
-        pecan_data_struct(i).test(j).accelforce.file = fullfile(...
-            force_files(I_config(j)).folder,force_files(I_config(j)).name);
-    end
 end
 
 %% get precrack files
@@ -381,6 +278,130 @@ for i = 1:n_pecan_diseased
     time_stamps_diseased(i) = time_unix(diseased_files(i).name);
 end
 
+%% load in data and initialize/preallocate arrays for force processing
+
+% get force files
+% get size of pre crack file structure
+n_force_files = sum(isforcefile);
+
+% get indices where force files is nonzero
+force_file_ind = find(isforcefile);
+
+% running sum of size of each subfolder
+fc_files_running_sum = 0;
+
+% build structure of force files
+for i = n_force_files:-1:1
+    % files for iteration
+    fc_iter_files = dir(fullfile(...
+        pwd,...
+        'PecanDataMaster',...
+        PecanDataMaster_folders(force_file_ind(i)).name,'*.tdms'));
+    
+    % n files for iteration
+    n_fc_iter_files = size(fc_iter_files,1);
+    
+    % force iteration start index
+    fc_iter_si = 1+fc_files_running_sum;
+    
+    % force iteration end index
+    fc_iter_ei = fc_iter_si+n_fc_iter_files-1;
+    
+    % assign files to structure
+    force_files(fc_iter_si:fc_iter_ei) = fc_iter_files;
+    
+    % update running sum
+    fc_files_running_sum = fc_files_running_sum+n_fc_iter_files;
+end
+
+% number of force files
+n_force_files = length(force_files);
+
+% initialize and preallocate
+pecan_test_metadata = cell(n_force_files,1);
+pecan_configuration_time = zeros(n_force_files,1);
+pecan_test_time = zeros(n_force_files,1);
+
+% calculate existing end index
+force_end_ind = 0;
+
+% get metadata for all force files
+for i = 1:n_force_files
+    pecan_test_metadata(i) = {force_files(i).name(24:71)};
+    pecan_configuration_time(i) = time_unix(force_files(i).name(8:22));
+    pecan_test_time(i) = time_unix(append(...
+        force_files(i).name(8:16),...
+        force_files(i).name(1:6)));
+end
+
+% get unique values 
+[pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,...
+    'stable');
+
+% array of timestamps for all files, including with force files
+time_stamps_aggregate_force = [time_stamps_pre_crack;time_stamps_post_crack;...
+    time_stamps_uncracked;time_stamps_diseased;pecan_test_time];
+
+% sorted time stamp array
+[~, I_sort_force] = sort(time_stamps_aggregate_force);
+
+% parameters
+n_images = n_pecan_pre_crack+n_pecan_post_crack+n_pecan_diseased+...
+    n_pecan_uncracked;
+
+% initialize/preallocate number of files deleted
+n_delete = 0;
+
+% delete double bounces
+for i = 1:(size(I_sort_force,1)-1)
+    if (I_sort_force(i)>n_images)&&(I_sort_force(i+1)>n_images)
+        pecan_test_metadata(I_sort_force(i+1)-n_images-n_delete) = [];
+        force_files(I_sort_force(i+1)-n_images-n_delete) = [];
+        n_delete = n_delete+1;
+    end
+end
+
+% initialize matrix with info about number of tests in each configuration
+I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
+
+% create pecan_data_struct and loop through number of testing 
+% configurations
+for i = (size(pecan_test_meta_data_unique,1)):-1:1
+    % check to see if data has been loaded
+    if params.pecan_data_struct_preexist
+        if pecan_configuration_time(i_meta_data(i)) <= final_data_existing_timestamp
+            continue
+        end
+    end
+    
+    % get metadata from each configuration
+    metadata = parsemetadata(pecan_test_meta_data_unique(i));
+    pecan_data_struct(i).metadata = metadata;
+    
+    % index for given configuration
+    I_config = find(ismember(pecan_test_metadata,...
+        pecan_test_meta_data_unique(i)));
+    
+    I_config_size(i) = size(I_config,1)-1;
+    
+    % loop through number of tests in each configuration
+    for j = 1:(size(I_config,1)-1)
+        
+        % capture force and accel time histories as well as max force/accel
+        [force,accel,max_force,max_accel] = force_accel_processing(...
+            fullfile(force_files(I_config(j)).folder,...
+            force_files(I_config(j)).name));
+        
+        % store data in struct
+        pecan_data_struct(i).test(j).accelforce.force = force;
+        pecan_data_struct(i).test(j).accelforce.accel = accel;
+        pecan_data_struct(i).test(j).accelforce.maxforce = max_force;
+        pecan_data_struct(i).test(j).accelforce.maxaccel = max_accel;
+        pecan_data_struct(i).test(j).accelforce.file = fullfile(...
+            force_files(I_config(j)).folder,force_files(I_config(j)).name);
+    end
+end
+
 %% aggregate data
 
 % array of timestamps for all files
@@ -400,11 +421,11 @@ end
 % initialize sum of I_config_size
 I_config_size_running_sum = 0;
 
-for i = 1:(size(pecan_test_meta_data_unique,1))
+for i = (size(pecan_test_meta_data_unique,1)):-1:1
     
     % continue if the data has already been logged in the .mat file
     if params.pecan_data_struct_preexist
-        if pecan_test_time(i_meta_data(i)) <= final_data_existing_timestamp
+        if pecan_configuration_time(i_meta_data(i)) <= final_data_existing_timestamp
             I_config_size_running_sum = ...
                 I_config_size_running_sum+I_config_size(i);
             continue
@@ -502,7 +523,6 @@ workspace;  % Make sure the workspace panel is showing.
 
 % remove unnecessary paths for path cleaning
 rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms');
-rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\FileTime');
 
 % finish timing of script
 elapsed_time = toc;
@@ -547,20 +567,20 @@ function date = time_unix(string)
 % was taken in unix time, i.e., time elapsed since midnight January 1st,
 % 1970.
 
-    % auxiliary variable to get first half of date info
-    aux = strsplit(string,'_');
-    
-    % convert to character array
-    yyyymmdd = char(aux(1));
-    
-    % relabel aux variable to get second half of date info
-    aux = strsplit(char(aux(2)),'.');
-    
-    % convert to character array
-    hhmmss = char(aux(1));
-    date = convertTo(datetime(str2double(yyyymmdd(1:4)),...
-        str2double(yyyymmdd(5:6)),str2double(yyyymmdd(7:8)),...
-        str2double(hhmmss(1:2)),str2double(hhmmss(3:4)),...
-        str2double(hhmmss(5:6))),'posixtime');
+% auxiliary variable to get first half of date info
+aux = strsplit(string,'_');
 
+% convert to character array
+yyyymmdd = char(aux(1));
+
+% relabel aux variable to get second half of date info
+aux = strsplit(char(aux(2)),'.');
+
+% convert to character array
+hhmmss = char(aux(1));
+date = convertTo(datetime(str2double(yyyymmdd(1:4)),...
+    str2double(yyyymmdd(5:6)),str2double(yyyymmdd(7:8)),...
+    str2double(hhmmss(1:2)),str2double(hhmmss(3:4)),...
+    str2double(hhmmss(5:6))),'posixtime');
+    
 end % time_unix
