@@ -41,9 +41,7 @@ end
 
 % checks to see if tdms function is in current MATLAB path and adds it if
 % it isn't in that path
-if ~contains(path,'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms')
-    addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
-end
+addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
 
 % set path of where data is located
 data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\PecanDataMaster';
@@ -78,7 +76,7 @@ end
 if params.pecan_data_struct_preexist
     % unix timestamp for final force in existing struct
     [~,force_final_name] = fileparts(pecan_data_struct(end).test(end).accelforce.file);
-    final_data_existing_timestamp = time_unix(force_final_name(1:15));
+    final_data_existing_timestamp = time_unix(force_final_name(8:22));
 end
 
 %% get all subfolders in PecanDataMaster
@@ -152,6 +150,10 @@ for i = 1:n_pecan_pre_crack
     time_stamps_pre_crack(i) = time_unix(pre_crack_files(i).name);
 end
 
+% fix sorting
+[time_stamps_pre_crack,I_pre_crack] = sort(time_stamps_pre_crack);
+pre_crack_files = pre_crack_files(I_pre_crack);
+
 %% get postcrack files
 
 % get post crack files
@@ -193,6 +195,10 @@ time_stamps_post_crack = zeros(n_pecan_post_crack,1);
 for i = 1:n_pecan_post_crack
     time_stamps_post_crack(i) = time_unix(post_crack_files(i).name);
 end
+
+% fix sorting
+[time_stamps_post_crack,I_post_crack] = sort(time_stamps_post_crack);
+post_crack_files = post_crack_files(I_post_crack);
 
 %% get uncracked files
 
@@ -236,6 +242,10 @@ for i = 1:n_pecan_uncracked
     time_stamps_uncracked(i) = time_unix(uncracked_files(i).name);
 end
 
+% fix sorting
+[time_stamps_uncracked,I_uncracked] = sort(time_stamps_uncracked);
+uncracked_files = uncracked_files(I_uncracked);
+
 %% get diseased files
 
 % get diseased files
@@ -277,6 +287,10 @@ time_stamps_diseased = zeros(n_pecan_diseased,1);
 for i = 1:n_pecan_diseased
     time_stamps_diseased(i) = time_unix(diseased_files(i).name);
 end
+
+% fix sorting
+[time_stamps_diseased,I_diseased] = sort(time_stamps_diseased);
+diseased_files = diseased_files(I_diseased);
 
 %% load in data and initialize/preallocate arrays for force processing
 
@@ -334,6 +348,13 @@ for i = 1:n_force_files
         force_files(i).name(1:6)));
 end
 
+% sort force files
+[~,I_sort_only_force] = sort(pecan_configuration_time);
+force_files = force_files(I_sort_only_force);
+pecan_test_metadata = pecan_test_metadata(I_sort_only_force);
+pecan_configuration_time = pecan_configuration_time(I_sort_only_force);
+pecan_test_time = pecan_test_time(I_sort_only_force);
+
 % get unique values 
 [pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,...
     'stable');
@@ -359,6 +380,16 @@ for i = 1:(size(I_sort_force,1)-1)
         force_files(I_sort_force(i+1)-n_images-n_delete) = [];
         n_delete = n_delete+1;
     end
+    if i>1
+        if (I_sort_force(i-1)>n_images)&&(I_sort_force(i)<n_pecan_pre_crack)&&(I_sort_force(i+1)>n_images)
+            
+            % handle weird case of double bounce at first index
+            warning('check this index')
+            pecan_test_metadata(I_sort_force(i-1)-n_images-n_delete) = [];
+            force_files(I_sort_force(i-1)-n_images-n_delete) = [];
+            n_delete = n_delete+1;
+        end
+    end
 end
 
 % initialize matrix with info about number of tests in each configuration
@@ -382,10 +413,10 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
     I_config = find(ismember(pecan_test_metadata,...
         pecan_test_meta_data_unique(i)));
     
-    I_config_size(i) = size(I_config,1)-1;
+    I_config_size(i) = size(I_config,1);
     
     % loop through number of tests in each configuration
-    for j = 1:(size(I_config,1)-1)
+    for j = 1:(size(I_config,1))
         
         % capture force and accel time histories as well as max force/accel
         [force,accel,max_force,max_accel] = force_accel_processing(...
@@ -419,7 +450,7 @@ for i = 1:n_pecan_post_crack
 end
 
 % initialize sum of I_config_size
-I_config_size_running_sum = 0;
+I_config_size_running_sum = sum(I_config_size(1:(end-1)));
 
 for i = (size(pecan_test_meta_data_unique,1)):-1:1
     
@@ -427,7 +458,7 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
     if params.pecan_data_struct_preexist
         if pecan_configuration_time(i_meta_data(i)) <= final_data_existing_timestamp
             I_config_size_running_sum = ...
-                I_config_size_running_sum+I_config_size(i);
+                I_config_size_running_sum-I_config_size(i-1);
             continue
         end
     end
@@ -508,9 +539,10 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                 break
             end
         end
-        
     end
-    I_config_size_running_sum = I_config_size_running_sum+I_config_size(i);
+    if i>1
+        I_config_size_running_sum = I_config_size_running_sum-I_config_size(i-1);
+    end
 end
 
 %% finalization
