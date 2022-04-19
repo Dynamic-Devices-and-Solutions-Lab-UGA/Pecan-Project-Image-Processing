@@ -506,21 +506,23 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                         PHE(pecan_data_struct(i).test(j).pre_crack_data.file,...
                         pecan_data_struct(i).test(j).post_crack_data.half(k-1).file);
                     
+                    if k == 2
+                        pecan_data_struct(i).test(j).result(k-1) = ...
+                            {'Successful Crack'};
+                        pecan_data_struct(i).test(j).pre_crack_data.pre_crack_bw = pre_crack_bw;
+                        pecan_data_struct(i).test(j).pre_crack_data.pre_crack_area = pre_crack_area;
+                    end
+                    
                     % populate structure
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).perc = perc;
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).post_crack_bw = post_crack_bw;
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).post_crack_area = post_crack_area;
-                    
-                    if k == 2
-                        pecan_data_struct(i).test(j).pre_crack_data.pre_crack_bw = pre_crack_bw;
-                        pecan_data_struct(i).test(j).pre_crack_data.pre_crack_area = pre_crack_area;
-                        pecan_data_struct(i).test(j).result(k-1) = ...
-                            {'Successful Crack'};
-                    end
                                      
                 elseif (((n_pecan_pre_crack+n_pecan_post_crack+1) ...
                         <= ind)&&((n_pecan_pre_crack+...
                         n_pecan_post_crack+n_pecan_uncracked) >= ind))
+                    
+                    pecan_data_struct(i).test(j).post_crack_data = [];
                     pecan_data_struct(i).test(j).result(k-1) = ...
                         {'Unsuccessful Crack'};
                     break
@@ -528,6 +530,7 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                         n_pecan_uncracked+1) <= ind)&&((...
                         n_pecan_pre_crack+n_pecan_post_crack+...
                         n_pecan_uncracked+n_pecan_diseased) >= ind))
+                    pecan_data_struct(i).test(j).post_crack_data = [];
                     pecan_data_struct(i).test(j).result(k-1) = ...
                         {'Diseased Pecan'};
                     break
