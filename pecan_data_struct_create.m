@@ -457,8 +457,10 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
     % continue if the data has already been logged in the .mat file
     if params.pecan_data_struct_preexist
         if pecan_configuration_time(i_meta_data(i)) <= final_data_existing_timestamp
-            I_config_size_running_sum = ...
-                I_config_size_running_sum-I_config_size(i-1);
+            if i>1
+                I_config_size_running_sum = ...
+                    I_config_size_running_sum-I_config_size(i-1);
+            end
             continue
         end
     end
