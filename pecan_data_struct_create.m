@@ -16,10 +16,10 @@
 % 4. add code to check that data going into structure seems correct/was
 % collected correctly - especially for image processing stuff
 % 5. figure out what fields to put in for nonstandard pecan cracking
-% outcomes. 
+% outcomes. - DONE
 %
 % Author: Dani Agramonte
-% Last Updated: 04.12.22
+% Last Updated: 04.19.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -180,7 +180,7 @@ for i = n_image_files:-1:1
     
     % assign files to structure
     post_crack_files(poc_iter_si:poc_iter_ei) = poc_iter_files;
-    
+     
     % update running sum
     poc_files_running_sum = poc_files_running_sum+n_poc_iter_files;
 end
@@ -373,22 +373,45 @@ n_images = n_pecan_pre_crack+n_pecan_post_crack+n_pecan_diseased+...
 % initialize/preallocate number of files deleted
 n_delete = 0;
 
-% delete double bounces
-for i = 1:(size(I_sort_force,1)-1)
-    if (I_sort_force(i)>n_images)&&(I_sort_force(i+1)>n_images)
-        pecan_test_metadata(I_sort_force(i+1)-n_images-n_delete) = [];
-        force_files(I_sort_force(i+1)-n_images-n_delete) = [];
-        n_delete = n_delete+1;
+% delete double bounces and bad data
+for i = 1:(size(I_sort_force,1))
+    % "normal" double bounces
+    if i<(size(I_sort_force,1))
+        if (I_sort_force(i)>n_images)&&(I_sort_force(i+1)>n_images)
+            pecan_test_metadata(I_sort_force(i+1)-n_images-n_delete) = [];
+            force_files(I_sort_force(i+1)-n_images-n_delete) = [];
+            n_delete = n_delete+1;
+            ind_delete(n_delete) = i+1;
+        end
     end
+    
+    % handle weird case of double bounce at first index
     if i>1
         if (I_sort_force(i-1)>n_images)&&(I_sort_force(i)<n_pecan_pre_crack)&&(I_sort_force(i+1)>n_images)
-            
-            % handle weird case of double bounce at first index
-            warning('check this index')
             pecan_test_metadata(I_sort_force(i-1)-n_images-n_delete) = [];
             force_files(I_sort_force(i-1)-n_images-n_delete) = [];
             n_delete = n_delete+1;
+            ind_delete(n_delete) = i-1;
         end
+    end
+end
+
+% delete weird data which sometimes appears at the end of a testing
+% configuration
+i = 1;
+while true
+    % delete entry if the size is incorrect
+    if force_files(i).bytes<1e3
+        force_files(i) = [];
+        pecan_test_metadata(i) = [];
+        n_delete = n_delete+1;
+    else
+        i = i+1;
+    end
+    
+    % if the index is the last index, break the statement
+    if i == size(force_files,2)
+        break
     end
 end
 
