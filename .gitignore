@@ -3,6 +3,7 @@
 
 # Ignore image data
 *.jpg
+*.tiff
 
 # Ignore TDMS data
 *.tdms
