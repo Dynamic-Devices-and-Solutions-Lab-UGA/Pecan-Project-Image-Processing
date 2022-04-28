@@ -9,6 +9,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% MATLAB initialization
+close all; % close all windows
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
@@ -34,6 +35,10 @@ burr_cs = fitdist(pecan_method_comp(:,3),'burr');
 % plot distributions with bar graph
 figure(1)
 bar(binRange,[hcbb;hcda;hccs]')
+title('Histogram comparison for different methods')
+xlabel('Percentage estimate')
+ylabel('Number of datapoints')
+legend('bounding box','direct area','calib surf')
 
 % plot cdfs
 figure(2)
@@ -60,3 +65,7 @@ x_cs = linspace(min_cs,max_cs,1e5);
 plot(x_bb,cdf(burr_bb,x_bb))
 plot(x_da,cdf(burr_da,x_da))
 plot(x_cs,cdf(burr_cs,x_cs))
+title('CDFs for different methods')
+xlabel('Percentage estimate')
+ylabel('CDF at val')
+legend('bounding box','direct area','calib surf')
