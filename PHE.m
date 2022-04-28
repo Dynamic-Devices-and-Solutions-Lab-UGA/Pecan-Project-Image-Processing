@@ -28,8 +28,8 @@ function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
 %                        or false values. false by default
 % method               : method by which ideal post cracked area is
 %                        calculated. The possible values for this are
-%                        'direct_area' or 'bounding_box'. 'bounding_box' by
-%                        default.
+%                        'direct_area', 'bounding_box', or 'calib_surf'.
+%                        'calib_surf' by default.
 %
 % Outputs
 % ---------------
@@ -50,20 +50,22 @@ function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
 [pre_crack_path,post_crack_path,params] = parseinputs(pre_crack_path,...
     post_crack_path,varargin{:});
 
-
-
 % Try to get pecan data from two image paths
 try
     try
         % try to use absolute path
-        [query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query,pre_crack_ecc,pre_crack_ext] = pecan_property_get(...
+        [query_pre_crack_area,query_length,query_width,...
+            bounding_box_query,bw_pre_crack_query,...
+            pre_crack_ecc,pre_crack_ext] = pecan_property_get(...
             pre_crack_path);
         pre_crack_bw = bw_pre_crack_query;
         pre_crack_area = query_pre_crack_area;
     catch
         currentFolder = pwd;
         Full_File_Path = fullfile(currentFolder,pre_crack_path);
-        [query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query,pre_crack_ecc,pre_crack_ecc] = pecan_property_get(...
+        [query_pre_crack_area,query_length,query_width,...
+            bounding_box_query,bw_pre_crack_query,...
+            pre_crack_ecc,pre_crack_ext] = pecan_property_get(...
             Full_File_Path);
         pre_crack_bw = bw_pre_crack_query;
         pre_crack_area = query_pre_crack_area;
@@ -75,15 +77,15 @@ end
 try
     try
         % try to use absolute path
-        [query_post_crack_area,~,~,~,bw_post_crack_query] = pecan_property_get(...
-            post_crack_path);
+        [query_post_crack_area,~,~,~,bw_post_crack_query,~,~]...
+            = pecan_property_get(post_crack_path);
         post_crack_bw = bw_post_crack_query;
         post_crack_area = query_post_crack_area;
     catch
         currentFolder = pwd;
         Full_File_Path = fullfile(currentFolder,post_crack_path);
-        [query_post_crack_area,~,~,~,bw_post_crack_query] = pecan_property_get(...
-            Full_File_Path);
+        [query_post_crack_area,~,~,~,bw_post_crack_query,~,~]...
+            = pecan_property_get(Full_File_Path);
         post_crack_bw = bw_post_crack_query;
         post_crack_area = query_post_crack_area;
     end
@@ -115,7 +117,16 @@ switch params.method
             'Pecan_Reference_Images/20220323_133327.jpg');
         perc = 100*query_post_crack_area/((ref_post_crack_area/...
             ref_pre_crack_area)*query_pre_crack_area);
-    case 2 % calibration surface method 
+    case 2 % calibration surface method
+        
+        % load in calibrated surface fit
+        load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\PHE_calibration_sfit.mat','calib_surf');
+        
+        % predicted ideal area of peacn half
+        predicted_ideal_area = calib_surf(pre_crack_ecc,pre_crack_ext)*query_pre_crack_area;
+        
+        % percent half estimate
+        perc = 100*query_post_crack_area/predicted_ideal_area;
 end
 
 if params.pre_cracked_bw
@@ -160,7 +171,7 @@ valid_properties = {'pre_cracked_bw', 'post_cracked_bw', 'bounding_box','method'
 params.pre_cracked_bw = 0;
 params.post_cracked_bw = 0;
 params.bounding_box = 0;
-params.method = 0;
+params.method = 2;
 
 while ~isempty(varargin)
     % Pop pair off varargin
@@ -218,9 +229,11 @@ while ~isempty(varargin)
                     params.method = 0;
                 case 'direct_area'
                     params.method = 1;
+                case 'calib_surf'
+                    params.method = 2;
                 otherwise
                     error('PHE_m2:InvalidValue',...
-                        'method must either be bounding_box or direct_area');
+                        'method must either be bounding_box, direct_area, or calib_surf');
             end
     end % switch property
 end % while

@@ -36,5 +36,5 @@ plot(calib_surf,...
 %% Shutdown tasks
 
 % save 
-save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\PHE_calibration_sfit','calib_surf')
+save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\PHE_calibration_sfit.mat');
 clear;

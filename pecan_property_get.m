@@ -120,7 +120,7 @@ end
 valid_properties = {'debug','bounding_box'};
 
 % Set default values
-params.debug_bw = 0;
+params.debug = 0;
 params.bounding_box = 0;
 
 while ~isempty(varargin)
