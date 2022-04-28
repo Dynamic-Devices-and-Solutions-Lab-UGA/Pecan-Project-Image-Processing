@@ -9,9 +9,12 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%% MATLAB initialization
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
+
+%% Load in data and calculate dates in unix time
 
 % Get pre crack files
 pre_crack_files = dir(fullfile(fullfile(pwd,...
@@ -43,7 +46,7 @@ for i = 1:n_pecan_post_crack
     time_stamps_post_crack(i) = time_unix(post_crack_files(i).name);
 end
 
-% get "diseased"/failed tests
+% Get diseased files
 diseased_files = dir(fullfile(fullfile(pwd,...
     'Pecan_Calibration_Images/Diseased'), '*.jpg'));
 
@@ -53,10 +56,12 @@ n_pecan_diseased = size(diseased_files,1);
 % initialize double array of diseased time stamps
 time_stamps_diseased = zeros(n_pecan_diseased,1);
 
-% get timestamps for diseased files
+% get photo timestamps for diseased files
 for i = 1:n_pecan_diseased
     time_stamps_diseased(i) = time_unix(diseased_files(i).name);
 end
+
+%% Order array
 
 % array of timestamps for all files
 time_stamps_aggregate = [time_stamps_pre_crack;...
@@ -77,6 +82,8 @@ I_sort_post_crack = zeros(n_pecan_post_crack,1);
 for i = 1:n_pecan_post_crack
     I_sort_post_crack(i) = find(I_sort == (n_pecan_pre_crack+i));
 end
+
+%% Populate calibration data matrix
 
 for i = 1:n_pecan_post_crack
     disp(i)
@@ -122,6 +129,19 @@ for i = 1:n_pecan_post_crack
     pecan_calibration_data(i,4) = pre_crack_ecc;
     pecan_calibration_data(i,5) = pre_crack_ext;
 end
+
+%% Shutdown tasks
+
+% save data to .mat file
+save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat','pecan_calibration_data');
+
+% clear data
+clear; % Clear variables
+clc;  % Clear command window.
+
+%-----------END MAIN SCRIPT-----------%
+
+%% get unix time function
 
 function date = time_unix(string)
 % time_unix: get string from picture files and return the time the picture
