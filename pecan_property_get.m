@@ -17,7 +17,7 @@ function [area,pec_length,pec_width,bounding_box,bw,ecc,ext] = pecan_property_ge
 % 
 % Optional Inputs
 % ---------------
-% debug_bw             : go into debug mode. show binary image. takes true
+% debug                : go into debug mode. show binary image. takes true
 %                        or false values. false by default
 % bounding_box         : turn bounding box around all images on. takes true
 %                        or false values. false by default
@@ -88,9 +88,9 @@ pec_width = min(dims);
 % bounding box info in terms of pixels
 bounding_box = s(1).BoundingBox;
 
-if params.debug_bw
+if params.debug
     figure
-    imshow(path)
+    imshow(I)
     showMaskAsOverlay(0.5,bw,'r')
     
     if params.bounding_box
@@ -117,7 +117,7 @@ if rem(length(varargin), 2) ~= 0
 end
 
 % Cell array of valid property names
-valid_properties = {'debug_bw','bounding_box'};
+valid_properties = {'debug','bounding_box'};
 
 % Set default values
 params.debug_bw = 0;
@@ -143,12 +143,12 @@ while ~isempty(varargin)
         
     % Check supplied property value
     switch property
-        case 'debug_bw'
+        case 'debug'
             switch value
                 case 'true'
-                    params.pre_cracked_bw = 1;
+                    params.debug = 1;
                 case 'false'
-                    params.pre_cracked_bw = 0;
+                    params.debug = 0;
                 otherwise
                     error('pecan_property_get:InvalidValue',...
                         'pre_cracked_bw must be either ''true'' or ''false''');

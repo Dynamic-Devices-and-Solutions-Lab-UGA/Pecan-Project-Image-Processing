@@ -14,6 +14,9 @@ clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
+% set debug parameter
+debug = 'false'; % valid values are 'true' or 'false'
+
 %% Load in data and calculate dates in unix time
 
 % Get pre crack files
@@ -111,16 +114,37 @@ for i = 1:n_pecan_post_crack
         pre_crack_files(pre_crack_ind).folder,...
         pre_crack_files(pre_crack_ind).name);
     
-    
-    % pre crack data
-    [pre_crack_area,pre_crack_pec_length,pre_crack_pec_width,~,...
-        pre_crack_bw,pre_crack_ecc,pre_crack_ext] = ...
-        pecan_property_get(pre_crack_file);
-    
-    % post crack data
-    [post_crack_area,post_crack_pec_length,post_crack_pec_width,~,...
-        post_crack_bw,post_crack_ecc,post_crack_ext] = ...
-        pecan_property_get(post_crack_file);
+    switch debug
+        case 'true'
+            % pre crack data
+            [pre_crack_area,pre_crack_pec_length,pre_crack_pec_width,~,...
+                pre_crack_bw,pre_crack_ecc,pre_crack_ext] = ...
+                pecan_property_get(pre_crack_file,'debug','true');
+
+            % post crack data
+            [post_crack_area,post_crack_pec_length,post_crack_pec_width,~,...
+                post_crack_bw,post_crack_ecc,post_crack_ext] = ...
+                pecan_property_get(post_crack_file,'debug','true');
+
+            % updates all figures
+            drawnow
+
+            % pause matlab for 2s
+            duration = 2;
+            java.lang.Thread.sleep(duration*1000) 
+
+            close all;
+        case 'false'
+            % pre crack data
+            [pre_crack_area,pre_crack_pec_length,pre_crack_pec_width,~,...
+                pre_crack_bw,pre_crack_ecc,pre_crack_ext] = ...
+                pecan_property_get(pre_crack_file);
+
+            % post crack data
+            [post_crack_area,post_crack_pec_length,post_crack_pec_width,~,...
+                post_crack_bw,post_crack_ecc,post_crack_ext] = ...
+                pecan_property_get(post_crack_file);
+    end
     
     % save variables to pecan_calibration_data matrix
     pecan_calibration_data(i,1) = post_crack_area/pre_crack_area;
