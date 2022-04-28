@@ -1,8 +1,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
 % 
-% See if there are different variables which effect the estimate of what
-% the true value of the half is 
+% load in calibration data and calculate necessary information so that
+% calibration curves can be generated in 
 %
 % Author: Dani Agramonte
 % Last Updated: 04.27.22
