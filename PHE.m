@@ -50,24 +50,20 @@ function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
 [pre_crack_path,post_crack_path,params] = parseinputs(pre_crack_path,...
     post_crack_path,varargin{:});
 
-% get reference values for area, length, and width
-[ref_pre_crack_area,ref_length,ref_width,bounding_box_ref,bw_pre_crack_ref] = pecan_property_get(...
-    'Pecan Test Images/20220323_133233.jpg');
-[ref_post_crack_area,~,~,~,bw_post_crack_ref] = pecan_property_get(...
-    'Pecan Test Images/20220323_133327.jpg');
+
 
 % Try to get pecan data from two image paths
 try
     try
         % try to use absolute path
-        [query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query] = pecan_property_get(...
+        [query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query,pre_crack_ecc,pre_crack_ext] = pecan_property_get(...
             pre_crack_path);
         pre_crack_bw = bw_pre_crack_query;
         pre_crack_area = query_pre_crack_area;
     catch
         currentFolder = pwd;
         Full_File_Path = fullfile(currentFolder,pre_crack_path);
-        [query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query] = pecan_property_get(...
+        [query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query,pre_crack_ecc,pre_crack_ecc] = pecan_property_get(...
             Full_File_Path);
         pre_crack_bw = bw_pre_crack_query;
         pre_crack_area = query_pre_crack_area;
@@ -96,12 +92,30 @@ catch ME
 end
 
 switch params.method
-    case 0
+    case 0 % bounding box method
+        
+        % get reference values for area, length, and width
+        [~,ref_length,ref_width,bounding_box_ref,bw_pre_crack_ref,~,~] = ...
+            pecan_property_get(...
+            'Pecan_Reference_Images/20220323_133233.jpg');
+        [ref_post_crack_area,~,~,~,bw_post_crack_ref,~,~] = ...
+            pecan_property_get(...
+            'Pecan_Reference_Images/20220323_133327.jpg');
         perc = 100*query_post_crack_area/((query_length/ref_length)*...
             (query_width/ref_width)*ref_post_crack_area);
-    case 1
+        
+    case 1 % direct area method with reference pecan
+        
+        % get reference values for area, length, and width
+        [ref_pre_crack_area,~,~,bounding_box_ref,bw_pre_crack_ref,~,~] = ...
+            pecan_property_get(...
+            'Pecan_Reference_Images/20220323_133233.jpg');
+        [ref_post_crack_area,~,~,~,bw_post_crack_ref,~,~] = ...
+            pecan_property_get(...
+            'Pecan_Reference_Images/20220323_133327.jpg');
         perc = 100*query_post_crack_area/((ref_post_crack_area/...
             ref_pre_crack_area)*query_pre_crack_area);
+    case 2 % calibration surface method 
 end
 
 if params.pre_cracked_bw
