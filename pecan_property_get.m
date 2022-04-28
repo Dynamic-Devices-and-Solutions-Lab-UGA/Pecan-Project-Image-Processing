@@ -1,4 +1,4 @@
-function [area,pec_length,pec_width,bounding_box,bw] = pecan_property_get(path,...
+function [area,pec_length,pec_width,bounding_box,bw,ecc,ext] = pecan_property_get(path,...
     varargin)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -67,23 +67,31 @@ bw = imfill(bw,'holes');
 bw = bwareafilt(bw,1);
 
 % find the area of the projected pecan
-s = regionprops(bw,'ConvexArea','BoundingBox');
+s = regionprops(bw,'ConvexArea','BoundingBox','Eccentricity','Extent');
 area = pecan_calibration(s(1).ConvexArea,'area');
 
 % find length and width of pecan
 dims = pecan_calibration(s(1).BoundingBox,'distance');
 
+% find extent
+ext = s.Extent;
+
+% find eccentricity
+ecc = s.Eccentricity;
+
+
 % remove shift in box
 dims = dims(3:4);
-pec_length = min(dims);
-pec_width = max(dims);
+pec_length = max(dims);
+pec_width = min(dims);
 
 % bounding box info in terms of pixels
 bounding_box = s(1).BoundingBox;
 
 if params.debug_bw
     figure
-    imshow(bw)
+    imshow(path)
+    showMaskAsOverlay(0.5,bw,'r')
     
     if params.bounding_box
         hold on

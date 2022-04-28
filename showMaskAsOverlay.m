@@ -1,4 +1,4 @@
-function varargout = showMaskAsOverlay2(opacity, mask, overlaycolor, varargin)
+function varargout = showMaskAsOverlay(opacity, mask, overlaycolor, varargin)
 % Copyright 2010 The MathWorks, Inc.
 
 % Show segmentation (mask) with user-specified transparency/color as overlay on image
