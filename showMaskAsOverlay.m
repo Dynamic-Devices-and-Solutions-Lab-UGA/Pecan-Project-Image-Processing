@@ -181,7 +181,7 @@ if isempty(tmp)
 end
 try
     a = imattributes(tmp(1));
-catch %#ok
+catch
     error('There doesn''t appear to be an image in the current figure.');
 end
 imsz = [str2num(a{2,2}),str2num(a{1,2})]; %#ok
@@ -223,7 +223,7 @@ hold on;
 h = imshow(newmask);
 try
     set(h,'alphadata',double(mask)*opacity,'tag','opaqueOverlay');
-catch %#ok
+catch
     set(h,'alphadata',opacity,'tag','opaqueOverlay');
 end
 if nargout > 0

@@ -143,4 +143,3 @@ function outputLocStats(pathname, locSum)
         disp(sprintf('%s : %d LOC',pathname, locSum));        
     end
 end
-
