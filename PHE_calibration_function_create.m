@@ -17,13 +17,19 @@ load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_D
 
 %% Fit data
 
+% turn off nuisance warning
+warning('off','curvefit:fit:iterationLimitReached')
+
 % fit columns 4 and 5 which correspond to eccentricity and extent,
 % respectively
 [calib_surf,qual_met,out_data] = fit(...
     [pecan_calibration_data(:,4),pecan_calibration_data(:,5)],...
     pecan_calibration_data(:,1),...
     'poly11',...
-    'Robust','Bisquare');
+    'Robust','LAR');
+
+% turn on nuisance warning again
+warning('on','curvefit:fit:iterationLimitReached')
 
 % plot result
 scatter3(pecan_calibration_data(:,4),pecan_calibration_data(:,5),...
@@ -32,6 +38,10 @@ hold on
 plot(calib_surf,...
     [pecan_calibration_data(:,4),pecan_calibration_data(:,5)],...
     pecan_calibration_data(:,1))
+
+xlabel('Eccentricity')
+ylabel('Extent')
+zlabel('Calibration Ratio (post/pre)')
 
 %% Shutdown tasks
 

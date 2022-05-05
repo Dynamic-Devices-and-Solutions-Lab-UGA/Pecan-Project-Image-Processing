@@ -99,7 +99,7 @@ isforcefile = zeros(size(PecanDataMaster_folders,1),1);
 % determine if file is force or image file
 for i = 1:size(PecanDataMaster_folders,1)
     isforcefile(i) = strcmp(...
-        PecanDataMaster_folders(i).name(20:end),'converted');
+        PecanDataMaster_folders(i).name(60:end),'converted');
 end
 
 %% get precrack files
@@ -180,7 +180,7 @@ for i = n_image_files:-1:1
     
     % assign files to structure
     post_crack_files(poc_iter_si:poc_iter_ei) = poc_iter_files;
-     
+    
     % update running sum
     poc_files_running_sum = poc_files_running_sum+n_poc_iter_files;
 end
@@ -373,29 +373,6 @@ n_images = n_pecan_pre_crack+n_pecan_post_crack+n_pecan_diseased+...
 % initialize/preallocate number of files deleted
 n_delete = 0;
 
-% delete double bounces and bad data
-for i = 1:(size(I_sort_force,1))
-    % "normal" double bounces
-    if i<(size(I_sort_force,1))
-        if (I_sort_force(i)>n_images)&&(I_sort_force(i+1)>n_images)
-            pecan_test_metadata(I_sort_force(i+1)-n_images-n_delete) = [];
-            force_files(I_sort_force(i+1)-n_images-n_delete) = [];
-            n_delete = n_delete+1;
-            ind_delete(n_delete) = i+1;
-        end
-    end
-    
-    % handle weird case of double bounce at first index
-    if i>1
-        if (I_sort_force(i-1)>n_images)&&(I_sort_force(i)<n_pecan_pre_crack)&&(I_sort_force(i+1)>n_images)
-            pecan_test_metadata(I_sort_force(i-1)-n_images-n_delete) = [];
-            force_files(I_sort_force(i-1)-n_images-n_delete) = [];
-            n_delete = n_delete+1;
-            ind_delete(n_delete) = i-1;
-        end
-    end
-end
-
 % delete weird data which sometimes appears at the end of a testing
 % configuration
 i = 1;
@@ -410,7 +387,7 @@ while true
     end
     
     % if the index is the last index, break the statement
-    if i == size(force_files,2)
+    if i > size(force_files,2)
         break
     end
 end
@@ -640,26 +617,3 @@ for i = 1:4
 end
 
 end % parsemetadata
-
-function date = time_unix(string)
-% time_unix: get string from picture files and return the time the picture
-% was taken in unix time, i.e., time elapsed since midnight January 1st,
-% 1970.
-
-% auxiliary variable to get first half of date info
-aux = strsplit(string,'_');
-
-% convert to character array
-yyyymmdd = char(aux(1));
-
-% relabel aux variable to get second half of date info
-aux = strsplit(char(aux(2)),'.');
-
-% convert to character array
-hhmmss = char(aux(1));
-date = convertTo(datetime(str2double(yyyymmdd(1:4)),...
-    str2double(yyyymmdd(5:6)),str2double(yyyymmdd(7:8)),...
-    str2double(hhmmss(1:2)),str2double(hhmmss(3:4)),...
-    str2double(hhmmss(5:6))),'posixtime');
-    
-end % time_unix
