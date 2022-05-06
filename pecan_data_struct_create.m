@@ -4,22 +4,11 @@
 % Create data structure with all the important properties about a given
 % pecan test run including metadata, test parameters, and results.
 %
-%
-% TO DO:
-% 1. Change how force files are processed to accomodate new file naming
-% convention and to handle to handle the fact that the order of tests won't
-% comply with ASCII ordering - DONE
-% 2. save structure as a .mat file in a predicted location and delete all
-% other variables to prevent clutter in the workspace - DONE
-% 3. add a pre-processing component in the beginning to load existing
-% structure in .mat form and append new data to it - DONE  
-% 4. add code to check that data going into structure seems correct/was
-% collected correctly - especially for image processing stuff
-% 5. figure out what fields to put in for nonstandard pecan cracking
-% outcomes. - DONE
+% Third processing script
+% pecan_data_clean -> pecan_data_transfer -> pecan_data_struct_create
 %
 % Author: Dani Agramonte
-% Last Updated: 04.19.22
+% Last Updated: 05.06.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

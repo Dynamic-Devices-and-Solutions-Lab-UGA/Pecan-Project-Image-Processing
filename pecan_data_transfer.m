@@ -1,10 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
 % 
-% After data has been 
+% After data has been cleaned, delete and move data as necessary
+%
+% Second processing script
+% pecan_data_clean -> pecan_data_transfer -> pecan_data_struct_create
 %
 % Author: Dani Agramonte
-% Last Updated: 05.05.22
+% Last Updated: 05.06.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -525,7 +528,7 @@ end
 
 % remove directories
 for i = 1:size(PecanDataMaster_folders,1)
-    if isforcefile
+    if isforcefile(i)
         rmdir(fullfile(PecanDataMaster_folders(i).folder,PecanDataMaster_folders(i).name));
     end
 end

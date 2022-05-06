@@ -4,8 +4,11 @@
 % Create I_sort structure to review all data and verify that it is good
 % before it is moved into the pecan data master folder
 %
+% First processing script
+% pecan_data_clean -> pecan_data_transfer -> pecan_data_struct_create
+%
 % Author: Dani Agramonte
-% Last Updated: 05.05.22
+% Last Updated: 05.06.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

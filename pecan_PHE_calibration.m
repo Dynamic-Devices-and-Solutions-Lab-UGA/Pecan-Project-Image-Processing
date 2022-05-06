@@ -5,7 +5,7 @@
 % calibration curves can be generated in 
 %
 % Author: Dani Agramonte
-% Last Updated: 04.27.22
+% Last Updated: 05.06.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -162,5 +162,3 @@ save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_D
 % clear data
 clear; % Clear variables
 clc;  % Clear command window.
-
-%-----------END MAIN SCRIPT-----------%
