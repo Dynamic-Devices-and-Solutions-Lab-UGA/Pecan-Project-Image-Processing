@@ -35,31 +35,6 @@ addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
 % set path of where data is located
 data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master';
 
-% ======================================================================= %
-% Turn off note "Warning: Added specified worksheet." that appears in the 
-% command window. To set the warning state, you must first know the 
-% message identifier for the one warning you want to enable. 
-% Query the last warning to acquire the identifier.  
-% 
-% For example: 
-% warnStruct = warning('query', 'last');
-% msgid_integerCat = warnStruct.identifier
-% 
-% Command window will show this:
-% msgid_integerCat =
-%    MATLAB:xlswrite:AddSheet
-% 
-% You need to pass the expression with the colons in it into the warning() 
-% function.
-%
-% Turn off note "Warning: Added specified worksheet." that appears in the 
-% command window.
-% ======================================================================= %
-
-if(~isdeployed)
-  cd(fileparts(which(mfilename)));
-end
-
 %% obtain data from pecan_data_struct if it exists
 
 if params.pecan_data_struct_preexist
