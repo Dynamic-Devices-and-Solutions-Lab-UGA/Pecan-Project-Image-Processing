@@ -324,12 +324,10 @@ end
 n_force_files = n_force_files-n_delete;
 
 % sort force files
-[~,I_sort_only_force] = sort(pecan_configuration_time);
+[pecan_test_time,I_sort_only_force] = sort(pecan_test_time);
 force_files = force_files(I_sort_only_force);
 pecan_test_metadata = pecan_test_metadata(I_sort_only_force);
 pecan_configuration_time = pecan_configuration_time(I_sort_only_force);
-pecan_test_time = pecan_test_time(I_sort_only_force);
-pecan_test_id = pecan_test_id(I_sort_only_force);
 
 % get unique values 
 [pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,...
@@ -360,7 +358,7 @@ for i = 1:size(imported_data,1)
     se_ind(i,2) = cellfun(@(x)str2double(x), temp(2));
     
     % loop from the start to the end index and delete everything
-    for j = se_ind(i,1):se_ind(i,2)
+    for j = se_ind(i,2):-1:se_ind(i,1)
         
         % calculate I_sort_force(j)
         isfj = I_sort_force(j);
@@ -373,8 +371,8 @@ for i = 1:size(imported_data,1)
             % remove file from file structure
             pre_crack_files(isfj) = [];
             % shift pecan size
-            n_pecan_sizes(1) = n_pecan_sizes(1)-1;
-            n_pecan_pre_crack = n_pecan_pre_crack-1;
+            %n_pecan_sizes(1) = n_pecan_sizes(1)-1;
+            %n_pecan_pre_crack = n_pecan_pre_crack-1;
         elseif isfj<=sum(n_pecan_sizes(1:2))
             % calculate index
             ind = isfj - n_pecan_sizes(1);
@@ -385,8 +383,8 @@ for i = 1:size(imported_data,1)
             % remove file from file structure
             post_crack_files(ind) = [];
             % shift pecan size
-            n_pecan_sizes(2) = n_pecan_sizes(2)-1;
-            n_pecan_post_crack = n_pecan_post_crack-1;
+            %n_pecan_sizes(2) = n_pecan_sizes(2)-1;
+            %n_pecan_post_crack = n_pecan_post_crack-1;
         elseif isfj<=sum(n_pecan_sizes(1:3))
             % calculate index
             ind = isfj - sum(n_pecan_sizes(1:2));
@@ -397,8 +395,8 @@ for i = 1:size(imported_data,1)
             % remove file from file structure
             uncracked_files(ind) = [];
             % shift pecan size
-            n_pecan_sizes(3) = n_pecan_sizes(3)-1;
-            n_pecan_uncracked = n_pecan_uncracked-1;
+            %n_pecan_sizes(3) = n_pecan_sizes(3)-1;
+            %n_pecan_uncracked = n_pecan_uncracked-1;
         elseif isfj<=sum(n_pecan_sizes(1:4))
             % calculate index
             ind = isfj - sum(n_pecan_sizes(1:3));
@@ -409,8 +407,8 @@ for i = 1:size(imported_data,1)
             % remove file from file structure
             diseased_files(ind) = [];
             % shift pecan size
-            n_pecan_sizes(4) = n_pecan_sizes(4)-1;
-            n_pecan_diseased = n_pecan_diseased-1;
+            %n_pecan_sizes(4) = n_pecan_sizes(4)-1;
+            %n_pecan_diseased = n_pecan_diseased-1;
         else
             % calculate index
             ind = isfj - sum(n_pecan_sizes(1:4));
@@ -420,19 +418,55 @@ for i = 1:size(imported_data,1)
             delete(file_to_delete);
             % remove file from file structure
             force_files(ind) = [];
-            % shift force size
-            n_force_files = n_force_files-1;
         end
     end
+    I_sort_force(se_ind(i,1):se_ind(i,2)) = [];
+end
+
+%% Create new directories
+
+% get current time vector
+time_current = clock;
+
+% pecan data master
+pec_data_fold = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master';
+
+% new folder name
+new_folder_main = strcat('Pecan_Data-',...
+    sprintf('%04d',time_current(1)),...
+    sprintf('%02d',time_current(2)),...
+    sprintf('%02d',time_current(3)),...
+    '_',...
+    sprintf('%02d',time_current(4)),...
+    sprintf('%02d',time_current(5)),...
+    sprintf('%02d',round(time_current(6))));
+
+% make directory
+mkdir(fullfile(pec_data_fold,new_folder_main));
+
+% folder structure
+force_folder = 'Pecan_Data-Force_Files';
+image_folder = 'Pecan_Data-Image_Files';
+image_subfolders = {'Pre_Crack','Post_Crack','Uncracked','Diseased'};
+
+% make folder structure
+% image folder
+mkdir(fullfile(pec_data_fold,new_folder_main,image_folder));
+% force folder
+mkdir(fullfile(pec_data_fold,new_folder_main,force_folder));
+
+% image subfolders
+for i = 1:4
+    mkdir(fullfile(pec_data_fold,new_folder_main,image_folder,image_subfolders{i}));
 end
 
 %% move files over to Pecan_Data_Master
 
 % image directory
-image_directory = fullfile(pwd,'Pecan_Data_Master\Pecan_Data-images');
+image_directory = fullfile(pec_data_fold,new_folder_main,image_folder);
 
 % pre crack destination
-pre_crack_destination = fullfile(image_directory,'Pre_Crack');
+pre_crack_destination = fullfile(image_directory,image_subfolders{1});
 
 % pre crack files
 for i = 1:size(pre_crack_files,2)
@@ -443,7 +477,7 @@ for i = 1:size(pre_crack_files,2)
 end
 
 % post crack destination
-post_crack_destination = fullfile(image_directory,'Post_Crack');
+post_crack_destination = fullfile(image_directory,image_subfolders{2});
 
 % post crack files
 for i = 1:size(post_crack_files,2)
@@ -454,7 +488,7 @@ for i = 1:size(post_crack_files,2)
 end
 
 % uncracked destination
-uncracked_destination = fullfile(image_directory,'Uncracked');
+uncracked_destination = fullfile(image_directory,image_subfolders{3});
 
 % uncracked files
 for i = 1:size(uncracked_files,2)
@@ -465,7 +499,7 @@ for i = 1:size(uncracked_files,2)
 end
 
 % diseased destination
-diseased_destination = fullfile(image_directory,'Diseased');
+diseased_destination = fullfile(image_directory,image_subfolders{4});
 
 % diseased files
 for i = 1:size(diseased_files,2)
@@ -476,7 +510,7 @@ for i = 1:size(diseased_files,2)
 end
 
 % force destination
-force_destination = fullfile(pwd,'Pecan_Data_Master\Pecan_Data-force_files');
+force_destination = fullfile(pec_data_fold,new_folder_main,force_folder);
 
 % force files
 for i = 1:size(force_files,2)

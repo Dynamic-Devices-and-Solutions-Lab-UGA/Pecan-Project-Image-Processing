@@ -20,8 +20,8 @@ workspace;  % Make sure the workspace panel is showing.
 
 %% Post-Initialize MATLAB
 
-%load in existing structure to append to it if it exists and create flag if
-%it does exist
+% load in existing structure to append to it if it exists and create flag if
+% it does exist
 params.pecan_data_struct_preexist = 0;
 if exist('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\pecan_data_struct.mat','file')~=0
     load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\pecan_data_struct.mat')
@@ -50,20 +50,33 @@ end
 all_PecanDataMaster_contents = dir(data_path);
 
 % remove files
-PecanDataMaster_folders = all_PecanDataMaster_contents(...
+PecanDataMaster_commits = all_PecanDataMaster_contents(...
     [all_PecanDataMaster_contents(:).isdir]);
 
 % remove '.' and '..'
-PecanDataMaster_folders = PecanDataMaster_folders(...
-    ~ismember({PecanDataMaster_folders(:).name},{'.','..'}));
+PecanDataMaster_commits = PecanDataMaster_commits(...
+    ~ismember({PecanDataMaster_commits(:).name},{'.','..'}));
 
 % empty array of values indicating if the file is an image file
-isforcefile = zeros(size(PecanDataMaster_folders,1),1);
+isforcefile = zeros(size(PecanDataMaster_commits,1),1);
+
+% get all subfolders of pecan data master commits
+for i = size(PecanDataMaster_commits,1):-1:1
+    
+    % create temp structure of all files
+    temp = dir(fullfile(PecanDataMaster_commits(i).folder,PecanDataMaster_commits(i).name));
+    
+    % remove '.' and '..'
+    temp = temp(~ismember({temp(:).name},{'.','..'}));
+    
+    for j = 1:2
+        PecanDataMaster_folders(2*i-j+1,1) = temp(end-j+1);
+    end
+end
 
 % determine if file is force or image file
 for i = 1:size(PecanDataMaster_folders,1)
-    isforcefile(i) = strcmp(...
-        PecanDataMaster_folders(i).name(60:end),'converted');
+    isforcefile(i,1) = strcmp(PecanDataMaster_folders(i).name,'Pecan_Data-Force_Files');
 end
 
 %% get precrack files
@@ -82,8 +95,7 @@ pc_files_running_sum = 0;
 for i = n_image_files:-1:1
     % files for iteration
     pc_iter_files = dir(fullfile(...
-        pwd,...
-        'Pecan_Data_Master',...
+        PecanDataMaster_folders(image_file_ind(i)).folder,...
         PecanDataMaster_folders(image_file_ind(i)).name,...
         'Pre_Crack','*.jpg'));
     
@@ -128,8 +140,7 @@ poc_files_running_sum = 0;
 for i = n_image_files:-1:1
     % files for iteration
     poc_iter_files = dir(fullfile(...
-        pwd,...
-        'Pecan_Data_Master',...
+        PecanDataMaster_folders(image_file_ind(i)).folder,...
         PecanDataMaster_folders(image_file_ind(i)).name,...
         'Post_Crack','*.jpg'));
     
@@ -174,8 +185,7 @@ uc_files_running_sum = 0;
 for i = n_image_files:-1:1
     % files for iteration
     uc_iter_files = dir(fullfile(...
-        pwd,...
-        'Pecan_Data_Master',...
+        PecanDataMaster_folders(image_file_ind(i)).folder,...
         PecanDataMaster_folders(image_file_ind(i)).name,...
         'Uncracked','*.jpg'));
     
@@ -220,8 +230,7 @@ dd_files_running_sum = 0;
 for i = n_image_files:-1:1
     % files for iteration
     dd_iter_files = dir(fullfile(...
-        pwd,...
-        'Pecan_Data_Master',...
+        PecanDataMaster_folders(image_file_ind(i)).folder,...
         PecanDataMaster_folders(image_file_ind(i)).name,...
         'Diseased','*.jpg'));
     
@@ -272,9 +281,9 @@ fc_files_running_sum = 0;
 for i = n_force_files:-1:1
     % files for iteration
     fc_iter_files = dir(fullfile(...
-        pwd,...
-        'Pecan_Data_Master',...
-        PecanDataMaster_folders(force_file_ind(i)).name,'*.tdms'));
+        PecanDataMaster_folders(force_file_ind(i)).folder,...
+        PecanDataMaster_folders(force_file_ind(i)).name,...
+        '*.tdms'));
     
     % n files for iteration
     n_fc_iter_files = size(fc_iter_files,1);
@@ -334,28 +343,6 @@ time_stamps_aggregate_force = [time_stamps_pre_crack;time_stamps_post_crack;...
 n_images = n_pecan_pre_crack+n_pecan_post_crack+n_pecan_diseased+...
     n_pecan_uncracked;
 
-% initialize/preallocate number of files deleted
-n_delete = 0;
-
-% delete weird data which sometimes appears at the end of a testing
-% configuration
-i = 1;
-while true
-    % delete entry if the size is incorrect
-    if force_files(i).bytes<1e3
-        force_files(i) = [];
-        pecan_test_metadata(i) = [];
-        n_delete = n_delete+1;
-    else
-        i = i+1;
-    end
-    
-    % if the index is the last index, break the statement
-    if i > size(force_files,2)
-        break
-    end
-end
-
 % initialize matrix with info about number of tests in each configuration
 I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
 
@@ -403,7 +390,7 @@ end
 time_stamps_aggregate = [time_stamps_pre_crack;time_stamps_post_crack;...
     time_stamps_uncracked;time_stamps_diseased];
 
-% sorted time stamp array
+% sorted time stamp array 
 [test, I_sort] = sort(time_stamps_aggregate);
 
 % get array of post crack indices
@@ -475,13 +462,11 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                     if k == 2
                         pecan_data_struct(i).test(j).result(k-1) = ...
                             {'Successful Crack'};
-                        pecan_data_struct(i).test(j).pre_crack_data.pre_crack_bw = pre_crack_bw;
                         pecan_data_struct(i).test(j).pre_crack_data.pre_crack_area = pre_crack_area;
                     end
                     
                     % populate structure
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).perc = perc;
-                    pecan_data_struct(i).test(j).post_crack_data.half(k-1).post_crack_bw = post_crack_bw;
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).post_crack_area = post_crack_area;
                                      
                 elseif (((n_pecan_pre_crack+n_pecan_post_crack+1) ...

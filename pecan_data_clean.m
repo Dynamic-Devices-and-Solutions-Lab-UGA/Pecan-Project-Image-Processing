@@ -323,12 +323,10 @@ end
 n_force_files = n_force_files-n_delete;
 
 % sort force files
-[~,I_sort_only_force] = sort(pecan_configuration_time);
+[pecan_test_time,I_sort_only_force] = sort(pecan_test_time);
 force_files = force_files(I_sort_only_force);
 pecan_test_metadata = pecan_test_metadata(I_sort_only_force);
 pecan_configuration_time = pecan_configuration_time(I_sort_only_force);
-pecan_test_time = pecan_test_time(I_sort_only_force);
-pecan_test_id = pecan_test_id(I_sort_only_force);
 
 % get unique values 
 [pecan_test_meta_data_unique,i_meta_data] = unique(pecan_test_metadata,...
