@@ -1,8 +1,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
 % 
-% Create I_sort structure to review all data and verify that it is good
-% before it is moved into the pecan data master folder
+% After data has been 
 %
 % Author: Dani Agramonte
 % Last Updated: 05.05.22
@@ -10,48 +9,17 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialize MATLAB
-tic; % begin timing script
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
 %% Post-Initialize MATLAB
 
-
-% checks to see if tdms function is in current MATLAB path and adds it if
-% it isn't in that path
-addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
-
 % set path of where data is located
 data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Temp';
 data_folder = 'Pecan_Data_Temp';
 
-% ======================================================================= %
-% Turn off note "Warning: Added specified worksheet." that appears in the 
-% command window. To set the warning state, you must first know the 
-% message identifier for the one warning you want to enable. 
-% Query the last warning to acquire the identifier.  
-% 
-% For example: 
-% warnStruct = warning('query', 'last');
-% msgid_integerCat = warnStruct.identifier
-% 
-% Command window will show this:
-% msgid_integerCat =
-%    MATLAB:xlswrite:AddSheet
-% 
-% You need to pass the expression with the colons in it into the warning() 
-% function.
-%
-% Turn off note "Warning: Added specified worksheet." that appears in the 
-% command window.
-% ======================================================================= %
-
-if(~isdeployed)
-  cd(fileparts(which(mfilename)));
-end
-
-%% get all subfolders in PecanDataMaster
+%% get all subfolders in PecanDataTemp
 
 % get all folder contents
 
@@ -268,7 +236,7 @@ diseased_files = diseased_files(I_diseased);
 
 % get force files
 % get size of pre crack file structure
-n_force_files = sum(isforcefile);
+n_force_folders = sum(isforcefile);
 
 % get indices where force files is nonzero
 force_file_ind = find(isforcefile);
@@ -277,7 +245,7 @@ force_file_ind = find(isforcefile);
 fc_files_running_sum = 0;
 
 % build structure of force files
-for i = n_force_files:-1:1
+for i = n_force_folders:-1:1
     % files for iteration
     fc_iter_files = dir(fullfile(...
         pwd,...
@@ -330,6 +298,9 @@ i = 1;
 while true
     % delete entry if the size is incorrect
     if force_files(i).bytes<1e3
+        % delete file
+        delete(fullfile(force_files(i).folder,force_files(i).name));
+        % remove tracking data
         force_files(i) = [];
         pecan_test_metadata(i) = [];
         pecan_configuration_time(i) = [];
@@ -339,7 +310,7 @@ while true
     else
         i = i+1;
     end
-    
+
     % if the index is the last index, break the statement
     if i > size(force_files,2)
         break
@@ -365,116 +336,205 @@ pecan_test_id = pecan_test_id(I_sort_only_force);
 time_stamps_aggregate_force = [time_stamps_pre_crack;time_stamps_post_crack;...
     time_stamps_uncracked;time_stamps_diseased;pecan_test_time];
 
+% array of sizes of different sections of sort array
+n_pecan_sizes = [n_pecan_pre_crack;n_pecan_post_crack;n_pecan_uncracked;n_pecan_diseased;n_force_files];
+
 % sorted time stamp array
 [tsaf_sort, I_sort_force] = sort(time_stamps_aggregate_force);
 
-%% create summary structure
+%% delete files
 
-for i = size(I_sort_force,1):-1:1
-    % populate summary structure
-    new_data_summ(i).I_sort_ind = I_sort_force(i);
-    new_data_summ(i).time = stand_time(tsaf_sort(i));
+% imported data from text file
+imported_data = importdata('rows_manually_deleted.txt');
+
+% initialize start/end ind matrix
+se_ind = zeros(size(imported_data,1),2);
+
+% read out data from text file
+for i = 1:size(imported_data,1)
+    temp = split(char(extractBetween(char(imported_data(i)),'(',')')),':');
+    se_ind(i,1) = cellfun(@(x)str2double(x), temp(1));
+    se_ind(i,2) = cellfun(@(x)str2double(x), temp(2));
     
-    if I_sort_force(i)<=n_pecan_pre_crack
-        new_data_summ(i).desc = 'pre crack image';
-    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack
-        new_data_summ(i).desc = 'post crack image';
-    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked
-        new_data_summ(i).desc = 'uncracked';
-    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased
-        new_data_summ(i).desc = 'diseased';
-    else
-        new_data_summ(i).desc = 'force file';
-        new_data_summ(i).metadata = pecan_test_metadata(I_sort_force(i)-(n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased));
-        new_data_summ(i).id = pecan_test_id(I_sort_force(i)-(n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased));
-    end
-end
-
-%% Delete bad data
-
-% insert rows which are manually selected
-new_data_summ(780:782) = [];
-new_data_summ(742:748) = [];
-new_data_summ(705:711) = [];
-new_data_summ(665:672) = [];
-new_data_summ(625:632) = [];
-new_data_summ(585:592) = [];
-new_data_summ(545:552) = [];
-new_data_summ(505:512) = [];
-new_data_summ(465:472) = [];
-new_data_summ(426:432) = [];
-new_data_summ(390:395) = [];
-new_data_summ(379:382) = [];
-new_data_summ(341:346) = [];
-new_data_summ(341:346) = [];
-new_data_summ(298:305) = [];
-new_data_summ(257:265) = [];
-new_data_summ(210:218) = [];
-new_data_summ(161:167) = [];
-new_data_summ(115:121) = [];
-new_data_summ(73:77) = [];
-new_data_summ(66:68) = [];
-new_data_summ(1:37) = [];
-
-%% Make sure ordering is correct
-
-for i = 1:size(new_data_summ,2)
-    if i == 1
-        if ~strcmp(new_data_summ(i).desc,'pre crack image')
-            disp('first entry should be a pre crack image')
-            disp(i)
-            break
-        end
-    else
-        if strcmp(new_data_summ(i).desc,'force file')
-            if ~strcmp(new_data_summ(i-1).desc,'pre crack image')
-                disp('a force file must always follow a pre crack image')
-                disp(i)
-                break
-            elseif ~((strcmp(new_data_summ(i+1).desc,'post crack image'))||(strcmp(new_data_summ(i+1).desc,'diseased'))||(strcmp(new_data_summ(i+1).desc,'uncracked')))
-                disp('either a post crack image, a diseased image, or an uncracked image must follow a force file')
-                disp(i)
-                break
-            end
-        elseif strcmp(new_data_summ(i).desc,'post crack image')
-            if (~strcmp(new_data_summ(i-1).desc,'force file'))&&(~strcmp(new_data_summ(i-1).desc,'post crack image'))
-                disp('a post crack image must always follow a force file unless it''s the second post crack image in a row')
-                disp(i)
-                break
-            elseif (strcmp(new_data_summ(i-1).desc,'post crack image'))&&(strcmp(new_data_summ(i-1).desc,'pre crack image'))
-                disp('if the previous image is a post crack image, the following image must be a post crack image')
-                break
-            end
-        elseif strcmp(new_data_summ(i).desc,'diseased')
-            if (~strcmp(new_data_summ(i-1).desc,'force file'))
-                disp('a force file must precede a diseased image')
-                disp(i)
-                break
-            elseif (~strcmp(new_data_summ(i+1).desc,'pre crack image'))
-                disp('a pre crack image must follow a diseased image')
-                disp(i)
-                break
-            end
-        elseif strcmp(new_data_summ(i).desc,'pre crack image')
-            if ~((strcmp(new_data_summ(i-1).desc,'post crack image'))||(strcmp(new_data_summ(i-1).desc,'diseased'))||(strcmp(new_data_summ(i-1).desc,'uncracked')))
-                disp('either a post crack image, a diseased image, or an uncracked image must precede a pre crack image')
-                disp(i)
-                break
-            elseif (~strcmp(new_data_summ(i+1).desc,'force file'))
-                disp('a force file must follow a pre crack image')
-                disp(i)
-                break
-            end
+    % loop from the start to the end index and delete everything
+    for j = se_ind(i,1):se_ind(i,2)
+        
+        % calculate I_sort_force(j)
+        isfj = I_sort_force(j);
+        
+        if isfj<=n_pecan_sizes(1)
+            % get file to delete
+            file_to_delete = fullfile(pre_crack_files(isfj).folder,pre_crack_files(isfj).name);
+            % delete file
+            delete(file_to_delete);
+            % remove file from file structure
+            pre_crack_files(isfj) = [];
+            % shift pecan size
+            n_pecan_sizes(1) = n_pecan_sizes(1)-1;
+            n_pecan_pre_crack = n_pecan_pre_crack-1;
+        elseif isfj<=sum(n_pecan_sizes(1:2))
+            % calculate index
+            ind = isfj - n_pecan_sizes(1);
+            % get file to delete
+            file_to_delete = fullfile(post_crack_files(ind).folder,post_crack_files(ind).name);
+            % delete file
+            delete(file_to_delete);
+            % remove file from file structure
+            post_crack_files(ind) = [];
+            % shift pecan size
+            n_pecan_sizes(2) = n_pecan_sizes(2)-1;
+            n_pecan_post_crack = n_pecan_post_crack-1;
+        elseif isfj<=sum(n_pecan_sizes(1:3))
+            % calculate index
+            ind = isfj - sum(n_pecan_sizes(1:2));
+            % get file to delete
+            file_to_delete = fullfile(uncracked_files(ind).folder,uncracked_files(ind).name);
+            % delete file
+            delete(file_to_delete);
+            % remove file from file structure
+            uncracked_files(ind) = [];
+            % shift pecan size
+            n_pecan_sizes(3) = n_pecan_sizes(3)-1;
+            n_pecan_uncracked = n_pecan_uncracked-1;
+        elseif isfj<=sum(n_pecan_sizes(1:4))
+            % calculate index
+            ind = isfj - sum(n_pecan_sizes(1:3));
+            % get file to delete
+            file_to_delete = fullfile(diseased_files(ind).folder,diseased_files(ind).name);
+            % delete file
+            delete(file_to_delete);
+            % remove file from file structure
+            diseased_files(ind) = [];
+            % shift pecan size
+            n_pecan_sizes(4) = n_pecan_sizes(4)-1;
+            n_pecan_diseased = n_pecan_diseased-1;
         else
-            if (~strcmp(new_data_summ(i-1).desc,'force file'))
-                disp('a force file must precede an uncracked image')
-                disp(i)
-                break
-            elseif (~strcmp(new_data_summ(i+1).desc,'pre crack image'))
-                disp('a pre crack image must follow an uncracked image')
-                disp(i)
-                break
-            end
-        end     
+            % calculate index
+            ind = isfj - sum(n_pecan_sizes(1:4));
+            % get file to delete
+            file_to_delete = fullfile(force_files(ind).folder,force_files(ind).name);
+            % delete file
+            delete(file_to_delete);
+            % remove file from file structure
+            force_files(ind) = [];
+            % shift force size
+            n_force_files = n_force_files-1;
+        end
     end
 end
+
+%% move files over to Pecan_Data_Master
+
+% image directory
+image_directory = fullfile(pwd,'Pecan_Data_Master\Pecan_Data-images');
+
+% pre crack destination
+pre_crack_destination = fullfile(image_directory,'Pre_Crack');
+
+% pre crack files
+for i = 1:size(pre_crack_files,2)
+    % get source file name 
+    pre_crack_file_source = fullfile(pre_crack_files(i).folder,pre_crack_files(i).name);
+    % move file
+    movefile(pre_crack_file_source,pre_crack_destination);
+end
+
+% post crack destination
+post_crack_destination = fullfile(image_directory,'Post_Crack');
+
+% post crack files
+for i = 1:size(post_crack_files,2)
+    % get source file name 
+    post_crack_file_source = fullfile(post_crack_files(i).folder,post_crack_files(i).name);
+    % move file
+    movefile(post_crack_file_source,post_crack_destination);
+end
+
+% uncracked destination
+uncracked_destination = fullfile(image_directory,'Uncracked');
+
+% uncracked files
+for i = 1:size(uncracked_files,2)
+    % get source file name 
+    uncracked_file_source = fullfile(uncracked_files(i).folder,uncracked_files(i).name);
+    % move file
+    movefile(uncracked_file_source,uncracked_destination);
+end
+
+% diseased destination
+diseased_destination = fullfile(image_directory,'Diseased');
+
+% diseased files
+for i = 1:size(diseased_files,2)
+    % get source file name 
+    diseased_file_source = fullfile(diseased_files(i).folder,diseased_files(i).name);
+    % move file
+    movefile(diseased_file_source,diseased_destination);
+end
+
+% force destination
+force_destination = fullfile(pwd,'Pecan_Data_Master\Pecan_Data-force_files');
+
+% force files
+for i = 1:size(force_files,2)
+    % get source file name 
+    force_file_source = fullfile(force_files(i).folder,force_files(i).name);
+    % move file
+    movefile(force_file_source,force_destination);
+end
+
+%% Delete force files/trash
+
+% running sum of size of each subfolder
+fc_files_running_sum = 0;
+
+% build structure of force files
+for i = n_force_folders:-1:1
+    % files for iteration
+    fc_iter_files = dir(fullfile(...
+        pwd,...
+        data_folder,...
+        PecanDataMaster_folders(force_file_ind(i)).name));
+    
+    % n files for iteration
+    n_fc_iter_files = size(fc_iter_files,1);
+    
+    % force iteration start index
+    fc_iter_si = 1+fc_files_running_sum;
+    
+    % force iteration end index
+    fc_iter_ei = fc_iter_si+n_fc_iter_files-1;
+    
+    % assign files to structure
+    force_files(fc_iter_si:fc_iter_ei) = fc_iter_files;
+    
+    % update running sum
+    fc_files_running_sum = fc_files_running_sum+n_fc_iter_files;
+end
+
+% remove '.' and '..'
+force_files([force_files.isdir]) = [];
+
+% force files
+for i = 1:size(force_files,2)
+    % get source file name 
+    force_file = fullfile(force_files(i).folder,force_files(i).name);
+    % delete file
+    delete(force_file);
+end
+
+% remove directories
+for i = 1:size(PecanDataMaster_folders,1)
+    if isforcefile
+        rmdir(fullfile(PecanDataMaster_folders(i).folder,PecanDataMaster_folders(i).name));
+    end
+end
+
+%% MATLAB closeup
+
+% remove unnecessary paths for path cleaning
+rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms');
+
+clear; % Clear variables
+clc;  % Clear command window.
+workspace;  % Make sure the workspace panel is showing.
