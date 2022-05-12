@@ -10,6 +10,8 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\pecan_data_struct.mat')
+
 figure
 for m = 1:2
     if m == 1
@@ -18,8 +20,8 @@ for m = 1:2
         y(m) = 655.33;
     end
     
-    for i = 10:18
-        x(i) = pecan_data_struct(i).metadata.Height;
+    for i = 1:9
+        x(i) = pecan_data_struct(9*(m-1)+i).metadata.Height;
 
         num = 0;
         den = 0;
@@ -38,6 +40,8 @@ for m = 1:2
                     end
                 case 'Unsuccessful Crack'
                     den = den+1;
+                        scatter3(x(i),y(m),0)
+                        hold on
                 case 'Diseased Pecan'
                     continue
             end

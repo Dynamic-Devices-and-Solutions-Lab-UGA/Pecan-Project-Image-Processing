@@ -1,10 +1,10 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
 % 
-% Compare direct area method vs bounding box scaling method
+% Compare different methods of calculating post crack area
 %
 % Author: Dani Agramonte
-% Last Updated: 03.30.22
+% Last Updated: 05.06.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -133,30 +133,3 @@ save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_D
 % clear data
 clear; % Clear variables
 clc;  % Clear command window.
-
-%-----------END MAIN SCRIPT-----------%
-
-%% get unix time function
-
-function date = time_unix(string)
-% time_unix: get string from picture files and return the time the picture
-% was taken in unix time, i.e., time elapsed since midnight January 1st,
-% 1970.
-
-% auxiliary variable to get first half of date info
-aux = strsplit(string,'_');
-
-% convert to character array
-yyyymmdd = char(aux(1));
-
-% relabel aux variable to get second half of date info
-aux = strsplit(char(aux(2)),'.');
-
-% convert to character array
-hhmmss = char(aux(1));
-date = convertTo(datetime(str2double(yyyymmdd(1:4)),...
-    str2double(yyyymmdd(5:6)),str2double(yyyymmdd(7:8)),...
-    str2double(hhmmss(1:2)),str2double(hhmmss(3:4)),...
-    str2double(hhmmss(5:6))),'posixtime');
-    
-end % time_unix

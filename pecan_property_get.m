@@ -28,24 +28,27 @@ function [area,pec_length,pec_width,bounding_box,bw,ecc,ext] = pecan_property_ge
 [path,params] = parseinputs(path,varargin{:});
 
 % read image from file
-I = imread(path);
+I_raw = imread(path);
 
 % get image dimensions
-im_dims = size(I);
+im_dims = size(I_raw);
 
 if (im_dims(1) == 1960)&&(im_dims(2) == 4032)
     % you're good!
+    
+    % crop image
+    I = imcrop(I_raw,[1500 150 1500 950]);
+    
 elseif (im_dims(2) == 1960)&&(im_dims(1) == 4032)
     % reshuffle dimensions to their correct values
-    I = permute(I,[2 1 3]);
+    I_raw = permute(I_raw,[2 1 3]);
+    
+    % crop image
+    I = imcrop(I_raw,[1500 150 1500 950]);
 else
     % dimensions aren't compatible with what is expected from the camera
     error('pecan_property_get:image is not correctly size');
 end
-
-% crop image
-I = imcrop(I,[1500 150 1500 950]);
-
 
 % initially binarize image
 X = imbinarize(I);
