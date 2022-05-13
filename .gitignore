@@ -5,6 +5,9 @@
 *.jpg
 *.tiff
 
+# ignore video data
+*.mp4
+
 # Ignore TDMS data
 *.tdms
 *.tdms_index

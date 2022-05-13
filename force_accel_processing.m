@@ -1,4 +1,4 @@
-function [force,accel,max_force,max_accel] = force_accel_processing(path)
+function [force,max_force] = force_accel_processing(path)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -28,8 +28,6 @@ end
 names = fieldnames(TDMS_Struct);
 force = force_accel_calibration(getfield(TDMS_Struct,names{2},...
     'Dev2_1_ai0','data'),'force');
-accel = force_accel_calibration(getfield(TDMS_Struct,names{2},...
-    'Dev2_1_ai1','data'),'acceleration');
 
 % error handling if force is empty
 if isempty(force)
@@ -39,4 +37,3 @@ if isempty(force)
 end
 
 max_force = max(force);
-max_accel = max(accel);
