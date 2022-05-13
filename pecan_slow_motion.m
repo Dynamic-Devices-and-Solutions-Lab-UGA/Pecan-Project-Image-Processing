@@ -72,19 +72,11 @@ for frame_index = 1:frame_final
 
     % read each frame of video
     video_frame = read(V,frame_index);
-    
-    % if it's the first iteration, define chart data
-    if frame_index == 1        
-        xlim([0 t(2*frame_index)])
-        xlabel('Time [ms]')
-        ylabel('Force [g]')
-        title('Force vs. Time during pecan impact')
-    end
 
     % top subplot
     subplot(2,1,1);
-    % plot image
-    imshow(imlocalbrighten(video_frame))
+    % plot image brightened
+    imshow(imadjust(video_frame,[0 0.5],[0 1],0.5))
 
     % bottom subplot
     subplot(2,1,2);
@@ -92,6 +84,11 @@ for frame_index = 1:frame_final
     % plot force data from t = 0 to 2*t_point, where t_point is the time of
     % the data point we're plotting
     plot(t(1:(2*frame_index)),force((1+shift(i)):(2*frame_index+shift(i))))
+    
+    xlim([0 t(2*frame_index)])
+    xlabel('Time [ms]')
+    ylabel('Force [g]')
+    title('Force vs. Time during pecan impact')
     
     % set aspect ratio of plot box
     pbaspect([size(video_frame,2),size(video_frame,1) 1])

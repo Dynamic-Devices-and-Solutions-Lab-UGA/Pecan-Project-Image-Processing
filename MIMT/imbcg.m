@@ -129,5 +129,3 @@ function B = adjbcg_gimp(A,brightness,contrast,gamma)
 		B = imclamp(B);
 	end
 end
-
-

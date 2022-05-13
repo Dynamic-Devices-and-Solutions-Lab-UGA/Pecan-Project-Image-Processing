@@ -110,17 +110,3 @@ function outmask = suppressbits(inmask)
 end
 
 end
-
-
-
-
-
-
-
-
-
-
-
-
-
-
