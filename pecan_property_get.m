@@ -20,7 +20,8 @@ function [area,pec_length,pec_width,bounding_box,bw,ecc,ext] = pecan_property_ge
 % debug                : go into debug mode. show binary image. takes true
 %                        or false values. false by default
 % bounding_box         : turn bounding box around all images on. takes true
-%                        or false values. false by default
+%                        or false values. false by d
+efault
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 

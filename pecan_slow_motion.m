@@ -15,13 +15,6 @@ workspace;  % Make sure the workspace panel is showing.
 
 %% Post-Initialization of MATLAB
 
-% adds TDMS function to MATLAB path
-addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
-% adds Windows API function to MATLAB path
-addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Windows_API'))
-% adds MIMT toolbox
-addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\MIMT'));
-
 % set path of where data is located
 data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Video_Data_Master';
 
@@ -110,11 +103,6 @@ for frame_index = 1:frame_final
 end
 
 %% Closeout MATLAB
-
-% remove unnecessary paths for path cleaning
-rmpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'));
-rmpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Windows_API'))
-rmpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\MIMT'));
 
 clear; % Clear variables
 clc;  % Clear command window.

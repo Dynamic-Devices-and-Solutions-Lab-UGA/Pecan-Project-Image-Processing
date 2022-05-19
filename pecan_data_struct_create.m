@@ -28,10 +28,6 @@ if exist('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Mast
     params.pecan_data_struct_preexist = 1;
 end
 
-% checks to see if tdms function is in current MATLAB path and adds it if
-% it isn't in that path
-addpath(genpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms'))
-
 % set path of where data is located
 data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master';
 
@@ -525,9 +521,6 @@ save(fullfile(data_path,'pecan_data_struct.mat'),'pecan_data_struct')
 clearvars -except pecan_data_struct; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
-
-% remove unnecessary paths for path cleaning
-rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms');
 
 % finish timing of script
 elapsed_time = toc;

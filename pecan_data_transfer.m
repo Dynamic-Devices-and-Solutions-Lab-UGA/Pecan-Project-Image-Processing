@@ -569,9 +569,6 @@ end
 
 %% MATLAB closeup
 
-% remove unnecessary paths for path cleaning
-rmpath('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\tdms');
-
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
