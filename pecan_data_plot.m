@@ -10,7 +10,8 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\pecan_data_struct.mat')
+load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Data_Master\pecan_data_struct.mat'])
 
 figure
 for m = 1:2

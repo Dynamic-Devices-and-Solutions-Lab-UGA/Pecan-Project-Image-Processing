@@ -20,7 +20,8 @@ workspace;  % Make sure the workspace panel is showing.
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Temp';
+data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Data_Temp'];
 data_folder = 'Pecan_Data_Temp';
 
 
@@ -350,14 +351,26 @@ for i = size(I_sort_force,1):-1:1
         new_data_summ(i).desc = 'pre crack image';
     elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack
         new_data_summ(i).desc = 'post crack image';
-    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked
+    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack+...
+            n_pecan_uncracked
         new_data_summ(i).desc = 'uncracked';
-    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased
+    elseif I_sort_force(i)<=n_pecan_pre_crack+n_pecan_post_crack+...
+            n_pecan_uncracked+n_pecan_diseased
         new_data_summ(i).desc = 'diseased';
     else
         new_data_summ(i).desc = 'force file';
-        new_data_summ(i).metadata = pecan_test_metadata(I_sort_force(i)-(n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased));
-        new_data_summ(i).id = pecan_test_id(I_sort_force(i)-(n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased));
+        new_data_summ(i).metadata = pecan_test_metadata(...
+            I_sort_force(i)-...
+            (n_pecan_pre_crack+...
+            n_pecan_post_crack+...
+            n_pecan_uncracked+...
+            n_pecan_diseased));
+        new_data_summ(i).id = pecan_test_id(...
+            I_sort_force(i)-...
+            (n_pecan_pre_crack+...
+            n_pecan_post_crack+...
+            n_pecan_uncracked+...
+            n_pecan_diseased));
     end
 end
 
@@ -407,18 +420,26 @@ for i = 1:size(new_data_summ,2)
                 disp('a force file must always follow a pre crack image')
                 disp(i)
                 break
-            elseif ~((strcmp(new_data_summ(i+1).desc,'post crack image'))||(strcmp(new_data_summ(i+1).desc,'diseased'))||(strcmp(new_data_summ(i+1).desc,'uncracked')))
-                disp('either a post crack image, a diseased image, or an uncracked image must follow a force file')
+            elseif ~((strcmp(new_data_summ(i+1).desc,'post crack image'))...
+                    ||(strcmp(new_data_summ(i+1).desc,'diseased'))||...
+                    (strcmp(new_data_summ(i+1).desc,'uncracked')))
+                disp(['either a post crack image, a diseased image,'...
+                    'or an uncracked image must follow a force file'])
                 disp(i)
                 break
             end
         elseif strcmp(new_data_summ(i).desc,'post crack image')
-            if (~strcmp(new_data_summ(i-1).desc,'force file'))&&(~strcmp(new_data_summ(i-1).desc,'post crack image'))
-                disp('a post crack image must always follow a force file unless it''s the second post crack image in a row')
+            if (~strcmp(new_data_summ(i-1).desc,'force file'))...
+                    &&(~strcmp(new_data_summ(i-1).desc,'post crack image'))
+                disp(['a post crack image must always follow a '...
+                    'force file unless it''s the second post crack'...
+                    'image in a row'])
                 disp(i)
                 break
-            elseif (strcmp(new_data_summ(i-1).desc,'post crack image'))&&(strcmp(new_data_summ(i-1).desc,'pre crack image'))
-                disp('if the previous image is a post crack image, the following image must be a post crack image')
+            elseif (strcmp(new_data_summ(i-1).desc,'post crack image'))...
+                    &&(strcmp(new_data_summ(i-1).desc,'pre crack image'))
+                disp(['if the previous image is a post crack image,'...
+                    'the following image must be a post crack image'])
                 break
             end
         elseif strcmp(new_data_summ(i).desc,'diseased')
@@ -432,8 +453,11 @@ for i = 1:size(new_data_summ,2)
                 break
             end
         elseif strcmp(new_data_summ(i).desc,'pre crack image')
-            if ~((strcmp(new_data_summ(i-1).desc,'post crack image'))||(strcmp(new_data_summ(i-1).desc,'diseased'))||(strcmp(new_data_summ(i-1).desc,'uncracked')))
-                disp('either a post crack image, a diseased image, or an uncracked image must precede a pre crack image')
+            if ~((strcmp(new_data_summ(i-1).desc,'post crack image'))...
+                    ||(strcmp(new_data_summ(i-1).desc,'diseased'))||...
+                    (strcmp(new_data_summ(i-1).desc,'uncracked')))
+                disp(['either a post crack image, a diseased image,'...
+                    'or an uncracked image must precede a pre crack image'])
                 disp(i)
                 break
             elseif (~strcmp(new_data_summ(i+1).desc,'force file'))

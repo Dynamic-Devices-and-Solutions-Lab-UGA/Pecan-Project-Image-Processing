@@ -157,7 +157,9 @@ end
 %% Shutdown tasks
 
 % save data to .mat file
-save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat','pecan_calibration_data');
+save(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Calibration_Data\'...
+    'Pecan_Calibration_Data_Main.mat'],'pecan_calibration_data');
 
 % clear data
 clear; % Clear variables
