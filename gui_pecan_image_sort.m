@@ -1,16 +1,21 @@
-function [] = gui_test(pecan_image_path)
+function [] = gui_pecan_image_sort(varargin)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Personal - Testing
+% DDSL - Pecan Project
 % 
-% Simple GUI test script
+% gui script for pecan data
 %
-% MATLAB Central Link: https://www.mathworks.com/matlabcentral/answers/1450-gui-for-keyboard-pressed-representing-the-push-button#answer_2123
-%
-% Author: Oleg Komarov
-% Last Updated: 05.26.22
+% Author: Dani Agramonte
+% Last Updated: 05.27.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% input parsing
+
+if nargin==2
+    pecan_image_path = varargin{1}; %#ok<NASGU>
+    dest_path = varargin{2};
+end
 
 %% figure parameters
 
@@ -29,8 +34,17 @@ desired_width = 1500;
 bkd = 'white';
 
 % calculate offset from edge
-left_offset = screen_width/2-(screen_width-desired_width)/2;
-bottom_offset = screen_height/2-(screen_height-desired_height)/2;
+left_offset = (screen_width-desired_width)/2;
+bottom_offset = (screen_height-desired_height)/2;
+
+%% debug mode
+
+% debug flag
+debug_flag = 1;
+
+if debug_flag
+    pecan_image_path = getRandImage;
+end
 
 %% initialize figure
 
@@ -112,81 +126,123 @@ g2.ColumnWidth = {'1x','1x','1x','1x','1x'};
 
 % create 5 buttons as a children of the uigridlayout in the uipanel
 b1 = uibutton(g2);
-b1.Text = 'Button 1';
+b1.Text = 'Pre Crack';
 b1.Layout.Row = 1;
 b1.Layout.Column = 1;
 
 b2 = uibutton(g2);
-b2.Text = 'Button 2';
+b2.Text = 'Post Crack';
 b2.Layout.Row = 1;
 b2.Layout.Column = 2;
 
 b3 = uibutton(g2);
-b3.Text = 'Button 3';
+b3.Text = 'Uncracked';
 b3.Layout.Row = 1;
 b3.Layout.Column = 3;
 
 b4 = uibutton(g2);
-b4.Text = 'Button 4';
+b4.Text = 'Diseased';
 b4.Layout.Row = 1;
 b4.Layout.Column = 4;
 
 b5 = uibutton(g2);
-b5.Text = 'Button 5';
+b5.Text = 'Delete';
 b5.Layout.Row = 1;
 b5.Layout.Column = 5;
 
 % specify callback functions for each 
-set(b1,'ButtonPushedFcn',@pb_call1)
-set(b2,'ButtonPushedFcn',@pb_call2)
-set(b3,'ButtonPushedFcn',@pb_call3)
-set(b4,'ButtonPushedFcn',@pb_call4)
-set(b5,'ButtonPushedFcn',@pb_call5)
+set(b1,'ButtonPushedFcn',{@pb_call1,debug_flag,dest_path})
+set(b2,'ButtonPushedFcn',{@pb_call2,debug_flag,dest_path})
+set(b3,'ButtonPushedFcn',{@pb_call3,debug_flag,dest_path})
+set(b4,'ButtonPushedFcn',{@pb_call4,debug_flag,dest_path})
+set(b5,'ButtonPushedFcn',{@pb_call5,debug_flag,dest_path})
 
 
+% specify callback function for the figure
 set(fh,'KeyPressFcn',@pb_kpf);
 
+%% actions of buttons
 
 function pb_call1(varargin)
-%S = varargin{3};  % Get the structure.
-disp('do the thing')
-
-function pb_call2(varargin)
-disp('do the second thing')
-
-function pb_call3(varargin)
-disp('do the third thing')
-
-function pb_call4(varargin)
-disp('do the fourth thing')
-
-function pb_call5(varargin)
-disp('do the fifth thing')
-
-% Do same action as button when pressed 'p'
-function pb_kpf(varargin)
-if varargin{1,2}.Character == '2'
-    pb_call2(varargin{:})
-elseif varargin{1,2}.Character == '1'
-    pb_call1(varargin{:})
-elseif varargin{1,2}.Character == '3'
-    pb_call3(varargin{:})
-elseif varargin{1,2}.Character == '4'
-    pb_call4(varargin{:})
-elseif varargin{1,2}.Character == '5'
-    pb_call5(varargin{:})
+    if ~varargin{2}
+        movefile(current_file_path,varargin{3})
+    end
 end
 
-function varargout = demoimgs
-    pth = fileparts(which('cameraman.tif'));
-    D = dir(pth);
-    C = {'.tif';'.jp';'.png';'.bmp'};
-    idx = false(size(D));
-    for ii = 1:length(C)
-        idx = idx | (arrayfun(@(x) any(strfind(x.name,C{ii})),D));
+function pb_call2(varargin)
+    if ~varargin{2}
+        movefile(current_file_path,varargin{3})
     end
-    D = D(idx);
-    for ii = 1:numel(D)
-        fprintf('%s\n',D(ii).name)
+end
+
+function pb_call3(varargin)
+    if ~varargin{2}
+        movefile(current_file_path,varargin{3})
     end
-    if nargout, varargout{1}=pth; end
+end
+
+function pb_call4(varargin)
+    if ~varargin{2}
+        movefile(current_file_path,varargin{3})
+    end
+end
+
+function pb_call5(varargin)
+    if ~varargin{2}
+        movefile(current_file_path,varargin{3})
+    end
+end
+
+% function which associates a key press with buttons
+function pb_kpf(varargin)
+
+    if varargin{1}.Character == '1'
+        pb_call1(varargin{:})
+    elseif varargin{1}.Character == '2'
+        pb_call2(varargin{:})
+    elseif varargin{1}.Character == '3'
+        pb_call3(varargin{:})
+    elseif varargin{1}.Character == '4'
+        pb_call4(varargin{:})
+    elseif varargin{1}.Character == '5'
+        pb_call5(varargin{:})
+    end
+end
+
+function randPath = getRandImage(imageDir, imageExtensions)
+    
+    % if imageDir doesn't exist, get it
+    if nargin < 1 || isempty(imageDir)
+        imageDir = fullfile(toolboxdir('images'), 'imdata');
+    end
+    
+    % ensure directory exists and throw error if not
+    assert(exist(imageDir,'dir')==7, 'Directory does not exist.')
+    
+    % if no image extensions are provided, get some
+    if nargin < 2 || isempty(imageExtensions)
+        %imageExtensions = {'.tif';'.tiff';'.jpeg';'.jpg';'.png';'.bmp'};
+        imageExtensions = {'.jpeg';'.jpg';'.png';'.svg';'.gif'};
+    else
+        assert(all(startsWith(imageExtensions, '.')), 'All file extensions must start with a period.')
+    end
+    
+    % Get paths to all images files from listed image extensions
+    % Ignore images that are greater than a threshold size in bytes
+    D = dir(imageDir);
+    [~,~,ext] = fileparts({D.name});
+    isExtMatch = ismember(lower(ext), lower(imageExtensions));
+    byteLimit = 1E7;
+    sizeOK = [D.bytes]<byteLimit;
+    imageList = D(isExtMatch & sizeOK);
+    imagePaths = fullfile({imageList.folder}, {imageList.name});
+    
+    % get rand index
+    ir = randi(numel(imagePaths));
+    
+    % assign to output
+    randPath = fullfile(D(ir).folder,imageList(ir).name);
+    
+end % getRandImage
+
+end % gui_pecan_image_sort

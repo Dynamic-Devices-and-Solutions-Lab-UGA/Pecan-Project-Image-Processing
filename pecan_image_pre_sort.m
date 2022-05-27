@@ -54,18 +54,6 @@ while ~stop_flag
     % get current file
     current_file_path = fullfile(psl_files(ix).folder,psl_files(ix).name);
     
-    % get image
-    im = imread(current_file_path);
-    
-    % create figure handle
-    h = figure(1);
-    
-    % constrain figure to always be on top
-    WindowAPI(h,'TopMost')
-    
-    % show figure
-    imshow(im)
-    
     % gather user input on what to do with image
     % '1' - pre crack
     % '2' - post crack
@@ -104,6 +92,8 @@ while ~stop_flag
     end
 end
 
+%-----------END MAIN SCTIPT-----------%
+
 function action = get_user_input()
     % display help text
     fprintf(['\nGuide:\n'...
@@ -114,4 +104,4 @@ function action = get_user_input()
         '''5'' - delete file\n\n']);
     
     action = input('Action to take with file: ');
-end
+end % end get use input
