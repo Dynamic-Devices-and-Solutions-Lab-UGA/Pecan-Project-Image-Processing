@@ -82,7 +82,7 @@ g.BackgroundColor = bkd;
 %% create image
 
 % load in image
-im_pec = imread(pecan_image_path,'ReductionLevel',30);
+im_pec = imread(pecan_image_path);
 
 % rotate image if it has to be 
 if size(im_pec,1)>size(im_pec,2)

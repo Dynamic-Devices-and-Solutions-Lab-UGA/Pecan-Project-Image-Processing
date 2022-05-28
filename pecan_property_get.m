@@ -41,8 +41,8 @@ if (im_dims(1) == 1960)&&(im_dims(2) == 4032)
     I = imcrop(I_raw,[1500 150 1500 950]);
     
 elseif (im_dims(2) == 1960)&&(im_dims(1) == 4032)
-    % reshuffle dimensions to their correct values
-    I_raw = permute(I_raw,[2 1 3]);
+    % rotate image
+    I_raw = imrotate(I_raw,90);
     
     % crop image
     I = imcrop(I_raw,[1500 150 1500 950]);

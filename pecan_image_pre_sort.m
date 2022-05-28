@@ -78,3 +78,9 @@ while ~stop_flag
         ix = ix+1;
     end
 end
+
+%% Closeout MATLAB
+
+clear; % Clear variables
+clc;  % Clear command window.
+workspace;  % Make sure the workspace panel is showing.
