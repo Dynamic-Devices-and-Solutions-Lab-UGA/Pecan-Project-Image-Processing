@@ -14,8 +14,14 @@ function [] = gui_pecan_image_sort(varargin)
 
 if nargin==2
     pecan_image_path = varargin{1}; %#ok<NASGU>
-    dest_path = varargin{2};
+    im_dir = varargin{2};
 end
+
+% set locations for destination
+prc_loc = fullfile(im_dir,'Pre_Crack');
+poc_loc = fullfile(im_dir,'Post_Crack');
+dd_loc = fullfile(im_dir,'Diseased');
+uc_loc = fullfile(im_dir,'Uncracked');
 
 %% figure parameters
 
@@ -40,7 +46,7 @@ bottom_offset = (screen_height-desired_height)/2;
 %% debug mode
 
 % debug flag
-debug_flag = 1;
+debug_flag = 0;
 
 if debug_flag
     pecan_image_path = getRandImage;
@@ -66,8 +72,8 @@ WindowAPI(fh,'TopMost')
 g = uigridlayout(fh);
 
 % set row and column heights
-g.RowHeight = {'20x','4x'};
-g.ColumnWidth = {'1x'};
+g.RowHeight = {'5x','1x'};
+g.ColumnWidth = {'5x'};
 
 % set grid background colors
 g.BackgroundColor = bkd;
@@ -75,11 +81,16 @@ g.BackgroundColor = bkd;
 
 %% create image
 
-% create uiimage object as a child of grid object
-im = uiimage(g);
+% load in image
+im_pec = imread(pecan_image_path,'ReductionLevel',30);
 
-% set uiimage object source
-im.ImageSource = pecan_image_path;
+% rotate image if it has to be 
+if size(im_pec,1)>size(im_pec,2)
+    im_pec = imrotate(im_pec,90);
+end
+
+% create uiimage object as a child of grid object
+im = uiimage(g,'ImageSource',im_pec);
 
 % set image so that image doesn't get cropped
 im.ScaleMethod = 'fit';
@@ -126,85 +137,112 @@ g2.ColumnWidth = {'1x','1x','1x','1x','1x'};
 
 % create 5 buttons as a children of the uigridlayout in the uipanel
 b1 = uibutton(g2);
-b1.Text = 'Pre Crack';
+b1.Text = '1 - Pre Crack';
 b1.Layout.Row = 1;
 b1.Layout.Column = 1;
 
 b2 = uibutton(g2);
-b2.Text = 'Post Crack';
+b2.Text = '2 - Post Crack';
 b2.Layout.Row = 1;
 b2.Layout.Column = 2;
 
 b3 = uibutton(g2);
-b3.Text = 'Uncracked';
+b3.Text = '3 - Diseased';
 b3.Layout.Row = 1;
 b3.Layout.Column = 3;
 
 b4 = uibutton(g2);
-b4.Text = 'Diseased';
+b4.Text = '4 - Uncracked';
 b4.Layout.Row = 1;
 b4.Layout.Column = 4;
 
 b5 = uibutton(g2);
-b5.Text = 'Delete';
+b5.Text = '5 - Delete';
 b5.Layout.Row = 1;
 b5.Layout.Column = 5;
 
 % specify callback functions for each 
-set(b1,'ButtonPushedFcn',{@pb_call1,debug_flag,dest_path})
-set(b2,'ButtonPushedFcn',{@pb_call2,debug_flag,dest_path})
-set(b3,'ButtonPushedFcn',{@pb_call3,debug_flag,dest_path})
-set(b4,'ButtonPushedFcn',{@pb_call4,debug_flag,dest_path})
-set(b5,'ButtonPushedFcn',{@pb_call5,debug_flag,dest_path})
+set(b1,'ButtonPushedFcn',{@pb_call1,debug_flag,prc_loc,fh})
+set(b2,'ButtonPushedFcn',{@pb_call2,debug_flag,poc_loc,fh})
+set(b3,'ButtonPushedFcn',{@pb_call3,debug_flag,dd_loc,fh})
+set(b4,'ButtonPushedFcn',{@pb_call4,debug_flag,uc_loc,fh})
+set(b5,'ButtonPushedFcn',{@pb_call5,debug_flag,fh})
 
 
 % specify callback function for the figure
-set(fh,'KeyPressFcn',@pb_kpf);
+set(fh,'KeyPressFcn',{@pb_kpf,debug_flag,prc_loc,poc_loc,dd_loc,uc_loc,pecan_image_path});
+
+% wait until button is pressed
+uiwait(fh);
 
 %% actions of buttons
 
+% pre crack
 function pb_call1(varargin)
-    if ~varargin{2}
-        movefile(current_file_path,varargin{3})
+    if ~varargin{3}
+        % resume function
+        uiresume(varargin{1})
+        disp('Pre Crack')
+        % move file
+        movefile(varargin{8},varargin{4})
     end
 end
 
+% post crack
 function pb_call2(varargin)
-    if ~varargin{2}
-        movefile(current_file_path,varargin{3})
+    if ~varargin{3}
+        % resume function
+        uiresume(varargin{1})
+        disp('Post Crack')
+        % move file
+        movefile(varargin{8},varargin{5})
     end
 end
 
+% diseased
 function pb_call3(varargin)
-    if ~varargin{2}
-        movefile(current_file_path,varargin{3})
+    if ~varargin{3}
+        % resume function
+        uiresume(varargin{1})
+        disp('Diseased')
+        % move file
+        movefile(varargin{8},varargin{6})
     end
 end
 
+% uncracked
 function pb_call4(varargin)
-    if ~varargin{2}
-        movefile(current_file_path,varargin{3})
+    if ~varargin{3}
+        % resume function
+        uiresume(varargin{1})
+        disp('Uncracked')
+        % move file
+        movefile(varargin{8},varargin{7})
     end
 end
 
+% delete
 function pb_call5(varargin)
-    if ~varargin{2}
-        movefile(current_file_path,varargin{3})
+    if ~varargin{3}
+        % resume function
+        uiresume(varargin{1})
+        disp('delete')
+        % delete 
+        delete(varargin{8})
     end
 end
 
 % function which associates a key press with buttons
 function pb_kpf(varargin)
-
-    if varargin{1}.Character == '1'
+    if varargin{2}.Character == '1'
         pb_call1(varargin{:})
-    elseif varargin{1}.Character == '2'
+    elseif varargin{2}.Character == '2'
         pb_call2(varargin{:})
-    elseif varargin{1}.Character == '3'
+    elseif varargin{2}.Character == '3'
         pb_call3(varargin{:})
-    elseif varargin{1}.Character == '4'
+    elseif varargin{2}.Character == '4'
         pb_call4(varargin{:})
-    elseif varargin{1}.Character == '5'
+    elseif varargin{2}.Character == '5'
         pb_call5(varargin{:})
     end
 end

@@ -61,27 +61,14 @@ while ~stop_flag
     % '4' - diseased
     % '5' - delete file
     
-    % determine what action to take with currently opened image
-    get_user_input()
+    % run GUI script
+    gui_pecan_image_sort(current_file_path,im_dir);
     
-    switch action
-        case 1
-            movefile(current_file_path,prc_loc);
-        case 2
-            movefile(current_file_path,poc_loc);
-        case 3
-            movefile(current_file_path,uc_loc);
-        case 4
-            movefile(current_file_path,dd_loc);
-        case 5
-            delete(current_file_path)
-        otherwise
-            % user did not input a valid action
-            disp('input a valid action!')
-            
-            % retry
-            continue
-    end
+    % close all figures
+    set(groot,'ShowHiddenHandles','on')
+    c = get(groot,'Children');
+    delete(c)
+    disp(ix)
     
     % check to see if stop flag value needs to be changed
     if ix == numel(psl_files)
@@ -91,17 +78,3 @@ while ~stop_flag
         ix = ix+1;
     end
 end
-
-%-----------END MAIN SCTIPT-----------%
-
-function action = get_user_input()
-    % display help text
-    fprintf(['\nGuide:\n'...
-        '''1'' - pre crack\n'...
-        '''2'' - post crack\n'...
-        '''3'' - uncracked\n'...
-        '''4'' - diseased\n'...
-        '''5'' - delete file\n\n']);
-    
-    action = input('Action to take with file: ');
-end % end get use input
