@@ -20,8 +20,9 @@ function [area,pec_length,pec_width,bounding_box,bw,ecc,ext] = pecan_property_ge
 % debug                : go into debug mode. show binary image. takes true
 %                        or false values. false by default
 % bounding_box         : turn bounding box around all images on. takes true
-%                        or false values. false by d
-efault
+%                        or false values. false by default
+% delay_figure         : delay creation of figure. takes true or false values
+%                        false by default
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -31,34 +32,60 @@ efault
 % read image from file
 I_raw = imread(path);
 
+%%%% -- Note -- %%%%
+% deal with matlab not properly handling the orientation property
+
+% get image info
+I_info = imfinfo(path);
+
+% orient image properly
+if isfield(I_info,'Orientation')
+    
+    % get orientation property
+    EXIF_Orientation = I_info.Orientation;
+    
+    %%%%%%%%%% ------------ %%%%%%%%%%%%
+    % note: only non mirror exif
+    % orientation values are currently 
+    % supported
+    %%%%%%%%%% ------------ %%%%%%%%%%%%
+    
+    switch EXIF_Orientation
+        case 1
+            % do nothing
+        case 6
+            % rotate 90 deg cw
+            I_raw = rot90(I_raw,-1);
+        case 3
+            % rotate 180 deg ccw
+            I_raw = rot90(I_raw,2);
+        case 8
+            % rotate 90 deg ccw
+            I_raw = rot90(I_raw,1);
+        otherwise
+            error('Orientation Property Value NOT Recognized')
+    end
+end
+
 % get image dimensions
 im_dims = size(I_raw);
 
-if (im_dims(1) == 1960)&&(im_dims(2) == 4032)
-    % you're good!
-    
-    % crop image
-    I = imcrop(I_raw,[1500 150 1500 950]);
-    
-elseif (im_dims(2) == 1960)&&(im_dims(1) == 4032)
-    % rotate image
-    I_raw = imrotate(I_raw,90);
-    
-    % crop image
-    I = imcrop(I_raw,[1500 150 1500 950]);
-else
+% crop image
+I = imcrop(I_raw,[1500 150 1500 950]);
+
+if ~((im_dims(1) == 1960)&&(im_dims(2) == 4032))
     % dimensions aren't compatible with what is expected from the camera
     error('pecan_property_get:image is not correctly size');
 end
 
-% initially binarize image
-X = imbinarize(I);
+% binarize image 
+X = imbinarize(I,'adaptive','Sensitivity',0.7);
 
 % read green channel
 bw = ~X(:,:,2);
 
 % create a morphological structural element
-SE  = strel('Disk',3,4);
+SE  = strel('Disk',4);
 
 % close the image with the previously generated morphological structural
 % element
@@ -93,8 +120,18 @@ pec_width = min(dims);
 bounding_box = s(1).BoundingBox;
 
 if params.debug
-    figure
-    imshow(I)
+    % create figure and figure handle
+    h = figure;
+    
+    % get current axis
+    ax = gca;
+    
+    if params.delay_figure
+        set(h, 'Visible', 'off');
+        drawnow;
+    end
+    
+    imshow(I,'Parent',ax)
     showMaskAsOverlay(0.5,bw,'r')
     
     if params.bounding_box
@@ -121,11 +158,12 @@ if rem(length(varargin), 2) ~= 0
 end
 
 % Cell array of valid property names
-valid_properties = {'debug','bounding_box'};
+valid_properties = {'debug','bounding_box','delay_figure'};
 
 % Set default values
 params.debug = 0;
 params.bounding_box = 0;
+params.delay_figure = 0;
 
 while ~isempty(varargin)
     % Pop pair off varargin
@@ -166,6 +204,16 @@ while ~isempty(varargin)
                 otherwise
                     error('pecan_property_get:InvalidValue',...
                         'bounding_box must be either ''true'' or ''false''');
+            end
+        case 'delay_figure'
+            switch value
+                case 'true'
+                    params.delay_figure = 1;
+                case 'false'
+                    params.delay_figure = 0;
+                otherwise
+                    error('pecan_property_get:InvalidValue',...
+                        'delay_figure must be either ''true'' or ''false''');
             end
     end % switch property
 end % while
