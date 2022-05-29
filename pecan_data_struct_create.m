@@ -16,7 +16,7 @@
 tic; % begin timing script
 
 clear; % Clear variables
-clc;  % Clear command window.
+% clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
 %% Post-Initialize MATLAB
@@ -43,7 +43,7 @@ uncracked_inds = find(strcmp(types_agg, 'uncracked'));
 % number of pecans to consider
 n_pecan_pre_crack = numel(pre_crack_inds);
 
-for i = n_pre_crack_inds:-1:1
+for i = n_pecan_pre_crack:-1:1
     pre_crack_files(i).folder = ver_summary_struct(pre_crack_inds(i)).folder;
     pre_crack_files(i).name = ver_summary_struct(pre_crack_inds(i)).filename;
     
@@ -62,7 +62,7 @@ end
 % number of pecans to consider
 n_pecan_post_crack = numel(post_crack_inds);
 
-for i = n_post_crack_inds:-1:1
+for i = n_pecan_post_crack:-1:1
     post_crack_files(i).folder = ver_summary_struct(post_crack_inds(i)).folder;
     post_crack_files(i).name = ver_summary_struct(post_crack_inds(i)).filename;
     
@@ -81,7 +81,7 @@ end
 % number of pecans to consider
 n_pecan_uncracked = numel(uncracked_inds);
 
-for i = n_uncracked_inds:-1:1
+for i = n_pecan_uncracked:-1:1
     uncracked_files(i).folder = ver_summary_struct(uncracked_inds(i)).folder;
     uncracked_files(i).name = ver_summary_struct(uncracked_inds(i)).filename;
     
@@ -100,17 +100,17 @@ end
 % number of pecans to consider
 n_force_files = numel(force_inds);
 
-for i = n_force_inds:-1:1
+for i = n_force_files:-1:1
     force_files(i).folder = ver_summary_struct(force_inds(i)).folder;
     force_files(i).name = ver_summary_struct(force_inds(i)).filename;
     
 end
 
 % initialize double array of pre crack time stamps
-time_stamps_force = zeros(n_pecan_force,1);
+time_stamps_force = zeros(n_force_files,1);
 
 % get photo timestamps for pre crack files
-for i = 1:n_pecan_force
+for i = 1:n_force_files
     time_stamps_force(i) = time_unix(force_files(i).name);
 end
 
@@ -147,22 +147,14 @@ end
 % get unique values 
 [pecan_test_meta_data_unique,~] = unique(pecan_test_metadata,'stable');
 
-% array of timestamps for all files, including with force files
-time_stamps_aggregate_force = [time_stamps_pre_crack;time_stamps_post_crack;...
-    time_stamps_uncracked;time_stamps_diseased;pecan_test_time];
-
-% sorted time stamp array
-[tsaf_sort, I_sort_force] = sort(time_stamps_aggregate_force);
-
-% parameters
-n_images = n_pecan_pre_crack+n_pecan_post_crack+n_pecan_uncracked;
-
 % initialize matrix with info about number of tests in each configuration
 I_config_size = zeros(size(pecan_test_meta_data_unique,1),1);
 
 % create pecan_data_struct and loop through number of testing 
 % configurations
+textprogressbar(pad('loading in force data:',60));
 for i = (size(pecan_test_meta_data_unique,1)):-1:1
+    textprogressbar(100-100*(i/size(pecan_test_meta_data_unique,1)),'backwards');
     % get metadata from each configuration
     metadata = parsemetadata(pecan_test_meta_data_unique(i));
     pecan_data_struct(i).metadata = metadata;
@@ -188,6 +180,7 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
             force_files(I_config(j)).folder,force_files(I_config(j)).name);
     end
 end
+textprogressbar('terminated');
 
 %% aggregate data
 
@@ -208,8 +201,9 @@ end
 % initialize sum of I_config_size
 I_config_size_running_sum = sum(I_config_size(1:(end-1)));
 
+textprogressbar(pad('creating pecan data structure:',60));
 for i = (size(pecan_test_meta_data_unique,1)):-1:1
-    disp(i)
+    textprogressbar(100-100*(i/size(pecan_test_meta_data_unique,1)),'backwards');
     
     % find pre crack indices in sorted list
     all_pre_crack_ind_i = find(sum(I_sort == ...
@@ -312,6 +306,7 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
         I_config_size_running_sum = I_config_size_running_sum-I_config_size(i-1);
     end
 end
+textprogressbar('terminated');
 
 %% finalization
 
