@@ -238,8 +238,7 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                         post_crack_files(post_crack_ind).name);
                     
                     % calculate pecan data for half
-                    [perc,~,~,pre_crack_bw,post_crack_bw,...
-                        pre_crack_area,post_crack_area] = ...
+                    [perc,~,~,~,~,pre_crack_area,post_crack_area] = ...
                         PHE(pecan_data_struct(i).test(j).pre_crack_data.file,...
                         pecan_data_struct(i).test(j).post_crack_data.half(k-1).file);
                     
@@ -261,16 +260,24 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                     uncracked_ind = ind-n_pecan_pre_crack-n_pecan_post_crack;
                     
                     % get file and store in structure
-                    pecan_data_struct(i).test(j).post_crack_data.file = ...
+                    pecan_data_struct(i).test(j).post_crack_data.half(k-1).file = ...
                         fullfile(uncracked_files(uncracked_ind).folder,...
                         uncracked_files(uncracked_ind).name);
                     
-                    % populate rest of structure
-                    pecan_data_struct(i).test(j).post_crack_data.perc = 0;
-                    pecan_data_struct(i).test(j).post_crack_data.post_crack_area = 0;
+                    % calculate pecan data for half
+                    [~,~,~,~,~,pre_crack_area,~] = ...
+                        PHE(pecan_data_struct(i).test(j).pre_crack_data.file,...
+                        pecan_data_struct(i).test(j).post_crack_data.half(k-1).file);
                     
-                    pecan_data_struct(i).test(j).result(k-1) = ...
-                        {'Unsuccessful Crack'};
+                    if k == 2
+                        pecan_data_struct(i).test(j).result(k-1) = ...
+                            {'Unsuccessful Crack'};
+                        pecan_data_struct(i).test(j).pre_crack_data.pre_crack_area = pre_crack_area;
+                    end
+                    
+                    % populate structure
+                    pecan_data_struct(i).test(j).post_crack_data.half(k-1).perc = 0;
+                    pecan_data_struct(i).test(j).post_crack_data.half(k-1).post_crack_area = 0;
                     break
                 elseif (1 <= ind)&&(n_pecan_pre_crack >= ind)
                     break

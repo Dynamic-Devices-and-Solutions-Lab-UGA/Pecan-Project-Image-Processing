@@ -70,13 +70,16 @@ end
 % get image dimensions
 im_dims = size(I_raw);
 
-% crop image
-I = imcrop(I_raw,[1500 150 1500 950]);
-
-if ~((im_dims(1) == 1960)&&(im_dims(2) == 4032))
+if (im_dims(1) == 4032)&&(im_dims(2) == 1960)
+    % if image dims are flipped, rotate ccw
+    I_raw = rot90(I_raw);
+elseif ~((im_dims(1) == 1960)&&(im_dims(2) == 4032))
     % dimensions aren't compatible with what is expected from the camera
     error('pecan_property_get:image is not correctly size');
 end
+
+% crop image
+I = imcrop(I_raw,[1500 150 1500 950]);
 
 % binarize image 
 X = imbinarize(I,'adaptive','Sensitivity',0.7);

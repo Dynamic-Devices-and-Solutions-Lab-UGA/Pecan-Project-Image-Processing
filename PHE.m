@@ -51,47 +51,17 @@ function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
     post_crack_path,varargin{:});
 
 % Try to get pecan data from two image paths
-try
-    try
-        % try to use absolute path
-        [query_pre_crack_area,query_length,query_width,...
-            bounding_box_query,bw_pre_crack_query,...
-            pre_crack_ecc,pre_crack_ext] = pecan_property_get(...
-            pre_crack_path);
-        pre_crack_bw = bw_pre_crack_query;
-        pre_crack_area = query_pre_crack_area;
-    catch
-        currentFolder = pwd;
-        Full_File_Path = fullfile(currentFolder,pre_crack_path);
-        [query_pre_crack_area,query_length,query_width,...
-            bounding_box_query,bw_pre_crack_query,...
-            pre_crack_ecc,pre_crack_ext] = pecan_property_get(...
-            Full_File_Path);
-        pre_crack_bw = bw_pre_crack_query;
-        pre_crack_area = query_pre_crack_area;
-    end
-catch ME
-    rethrow(ME)
-end
 
-try
-    try
-        % try to use absolute path
-        [query_post_crack_area,~,~,~,bw_post_crack_query,~,~]...
-            = pecan_property_get(post_crack_path);
-        post_crack_bw = bw_post_crack_query;
-        post_crack_area = query_post_crack_area;
-    catch
-        currentFolder = pwd;
-        Full_File_Path = fullfile(currentFolder,post_crack_path);
-        [query_post_crack_area,~,~,~,bw_post_crack_query,~,~]...
-            = pecan_property_get(Full_File_Path);
-        post_crack_bw = bw_post_crack_query;
-        post_crack_area = query_post_crack_area;
-    end
-catch ME
-    rethrow(ME)
-end
+% try to use absolute path
+[query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query,...
+    pre_crack_ecc,pre_crack_ext] = pecan_property_get(pre_crack_path);
+pre_crack_bw = bw_pre_crack_query;
+pre_crack_area = query_pre_crack_area;
+
+% try to use absolute path
+[query_post_crack_area,~,~,~,bw_post_crack_query,~,~]= pecan_property_get(post_crack_path);
+post_crack_bw = bw_post_crack_query;
+post_crack_area = query_post_crack_area;
 
 switch params.method
     case 0 % bounding box method

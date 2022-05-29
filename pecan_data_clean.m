@@ -20,9 +20,10 @@ workspace;  % Make sure the workspace panel is showing.
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Data_Temp'];
-data_folder = 'Pecan_Data_Temp';
+data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\'...
+    'Pecan_Data-20220526_145147'];
+data_folder = 'Pecan_Data-20220526_145147';
+clear('textprogressbar'); % clear persistent vars in textprogressbar
 
 %% get precrack files
 
