@@ -23,7 +23,7 @@ commandwindow();
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\Pecan_Data-20220526_145147';
+data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master';
 
 % load in info about valid files
 load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\DataStatus','ver_summary_struct')
@@ -278,6 +278,8 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                     % populate structure
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).perc = 0;
                     pecan_data_struct(i).test(j).post_crack_data.half(k-1).post_crack_area = 0;
+                    pecan_data_struct(i).test(j).post_crack_data.half(k).perc = 0;
+                    pecan_data_struct(i).test(j).post_crack_data.half(k).post_crack_area = 0;
                     break
                 elseif (1 <= ind)&&(n_pecan_pre_crack >= ind)
                     break
