@@ -15,11 +15,7 @@ workspace;  % Make sure the workspace panel is showing.
 
 %% create workers if they don't exist
 
-p = gcp('nocreate'); % If no pool, do not create new one.
-if isempty(p)
-    % start parallel pool
-    parpool;
-end
+pool_control('start')
 
 %% main
 

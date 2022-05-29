@@ -19,71 +19,20 @@ workspace;  % Make sure the workspace panel is showing.
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Temp';
+data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Data_Temp'];
 data_folder = 'Pecan_Data_Temp';
-
-%% get all subfolders in PecanDataTemp
-
-% get all folder contents
-
-all_PecanDataMaster_contents = dir(data_path);
-
-% remove files
-PecanDataMaster_folders = all_PecanDataMaster_contents(...
-    [all_PecanDataMaster_contents(:).isdir]);
-
-% remove '.' and '..'
-PecanDataMaster_folders = PecanDataMaster_folders(...
-    ~ismember({PecanDataMaster_folders(:).name},{'.','..'}));
-
-% empty array of values indicating if the file is an image file
-isforcefile = zeros(size(PecanDataMaster_folders,1),1);
-
-% determine if file is force or image file
-for i = 1:size(PecanDataMaster_folders,1)
-    isforcefile(i) = strcmp(...
-        PecanDataMaster_folders(i).name(60:end),'converted');
-end
 
 %% get precrack files
 
-% get pre crack files
-% get size of pre crack file structure
-n_image_folders = sum(~isforcefile);
-
-% get indices where force files is nonzero
-image_file_ind = find(~isforcefile);
-
-% running sum of size of each subfolder
-pc_files_running_sum = 0;
-
-% build structure of pre crack files
-for i = n_image_folders:-1:1
-    % files for iteration
-    pc_iter_files = dir(fullfile(...
-        pwd,...
-        data_folder,...
-        PecanDataMaster_folders(image_file_ind(i)).name,...
-        'Pre_Crack','*.jpg'));
-    
-    % n files for iteration
-    n_pc_iter_files = size(pc_iter_files,1);
-    
-    % pre crack iteration start index
-    pc_iter_si = 1+pc_files_running_sum;
-    
-    % pre_crack_iteration end index
-    pc_iter_ei = pc_iter_si+n_pc_iter_files-1;
-    
-    % assign files to structure
-    pre_crack_files(pc_iter_si:pc_iter_ei) = pc_iter_files;
-    
-    % update running sum
-    pc_files_running_sum = pc_files_running_sum+n_pc_iter_files;
-end
+% assign files to structure
+pre_crack_files = dir(fullfile(...
+    data_path,...
+    'Pecan_Data-Image_Files',...
+    'Pre_Crack','*.jpg'));
 
 % number of pecans to consider
-n_pecan_pre_crack = length(pre_crack_files);
+n_pecan_pre_crack = numel(pre_crack_files);
 
 % initialize double array of pre crack time stamps
 time_stamps_pre_crack = zeros(n_pecan_pre_crack,1);
@@ -99,42 +48,19 @@ pre_crack_files = pre_crack_files(I_pre_crack);
 
 %% get postcrack files
 
-% get post crack files
-% running sum of size of each subfolder
-poc_files_running_sum = 0;
-
-% build structure of post crack files
-for i = n_image_folders:-1:1
-    % files for iteration
-    poc_iter_files = dir(fullfile(...
-        pwd,...
-        data_folder,...
-        PecanDataMaster_folders(image_file_ind(i)).name,...
-        'Post_Crack','*.jpg'));
-    
-    % n files for iteration
-    n_poc_iter_files = size(poc_iter_files,1);
-    
-    % post crack iteration start index
-    poc_iter_si = 1+poc_files_running_sum;
-    
-    % post_crack_iteration end index
-    poc_iter_ei = poc_iter_si+n_poc_iter_files-1;
-    
-    % assign files to structure
-    post_crack_files(poc_iter_si:poc_iter_ei) = poc_iter_files;
-    
-    % update running sum
-    poc_files_running_sum = poc_files_running_sum+n_poc_iter_files;
-end
+% assign files to structure
+post_crack_files = dir(fullfile(...
+    data_path,...
+    'Pecan_Data-Image_Files',...
+    'Post_Crack','*.jpg'));
 
 % number of pecans to consider
-n_pecan_post_crack = length(post_crack_files);
+n_pecan_post_crack = numel(post_crack_files);
 
 % initialize double array of pre crack time stamps
 time_stamps_post_crack = zeros(n_pecan_post_crack,1);
 
-% get photo timestamps for pre crack files
+% get photo timestamps for post crack files
 for i = 1:n_pecan_post_crack
     time_stamps_post_crack(i) = time_unix(post_crack_files(i).name);
 end
@@ -145,42 +71,19 @@ post_crack_files = post_crack_files(I_post_crack);
 
 %% get uncracked files
 
-% get uncracked files
-% running sum of size of each subfolder
-uc_files_running_sum = 0;
-
-% build structure of uncracked files
-for i = n_image_folders:-1:1
-    % files for iteration
-    uc_iter_files = dir(fullfile(...
-        pwd,...
-        data_folder,...
-        PecanDataMaster_folders(image_file_ind(i)).name,...
-        'Uncracked','*.jpg'));
-    
-    % n files for iteration
-    n_uc_iter_files = size(uc_iter_files,1);
-    
-    % uncracked iteration start index
-    uc_iter_si = 1+uc_files_running_sum;
-    
-    % uncracked iteration end index
-    uc_iter_ei = uc_iter_si+n_uc_iter_files-1;
-    
-    % assign files to structure
-    uncracked_files(uc_iter_si:uc_iter_ei) = uc_iter_files;
-    
-    % update running sum
-    uc_files_running_sum = uc_files_running_sum+n_uc_iter_files;
-end
+% assign files to structure
+uncracked_files = dir(fullfile(...
+    data_path,...
+    'Pecan_Data-Image_Files',...
+    'Uncracked','*.jpg'));
 
 % number of pecans to consider
-n_pecan_uncracked = length(uncracked_files);
+n_pecan_uncracked = numel(uncracked_files);
 
-% initialize double array of pre crack time stamps
+% initialize double array of post crack time stamps
 time_stamps_uncracked = zeros(n_pecan_uncracked,1);
 
-% get photo timestamps for pre crack files
+% get photo timestamps for post crack files
 for i = 1:n_pecan_uncracked
     time_stamps_uncracked(i) = time_unix(uncracked_files(i).name);
 end
@@ -191,42 +94,19 @@ uncracked_files = uncracked_files(I_uncracked);
 
 %% get diseased files
 
-% get diseased files
-% running sum of size of each subfolder
-dd_files_running_sum = 0;
-
-% build structure of diseased files
-for i = n_image_folders:-1:1
-    % files for iteration
-    dd_iter_files = dir(fullfile(...
-        pwd,...
-        data_folder,...
-        PecanDataMaster_folders(image_file_ind(i)).name,...
-        'Diseased','*.jpg'));
-    
-    % n files for iteration
-    n_dd_iter_files = size(dd_iter_files,1);
-    
-    % diseased iteration start index
-    dd_iter_si = 1+dd_files_running_sum;
-    
-    % diseased iteration end index
-    dd_iter_ei = dd_iter_si+n_dd_iter_files-1;
-    
-    % assign files to structure
-    diseased_files(dd_iter_si:dd_iter_ei) = dd_iter_files;
-    
-    % update running sum
-    dd_files_running_sum = dd_files_running_sum+n_dd_iter_files;
-end
+% assign files to structure
+diseased_files = dir(fullfile(...
+    data_path,...
+    'Pecan_Data-Image_Files',...
+    'Diseased','*.jpg'));
 
 % number of pecans to consider
-n_pecan_diseased = length(diseased_files);
+n_pecan_diseased = numel(diseased_files);
 
-% initialize double array of pre crack time stamps
+% initialize double array of diseased time stamps
 time_stamps_diseased = zeros(n_pecan_diseased,1);
 
-% get photo timestamps for pre crack files
+% get photo timestamps for diseased files
 for i = 1:n_pecan_diseased
     time_stamps_diseased(i) = time_unix(diseased_files(i).name);
 end
@@ -237,26 +117,29 @@ diseased_files = diseased_files(I_diseased);
 
 %% load in data and initialize/preallocate arrays for force processing
 
-% get force files
-% get size of pre crack file structure
-n_force_folders = sum(isforcefile);
+% initial dir call
+force_folders = dir(fullfile(data_path,'Pecan_Data-Force_Files'));
 
-% get indices where force files is nonzero
-force_file_ind = find(isforcefile);
+% remove '.' and '..'
+force_folders = force_folders(~ismember({force_folders.name},{'.','..'}));
+
+% get number of force folders
+n_force_folders = numel(force_folders);
 
 % running sum of size of each subfolder
 fc_files_running_sum = 0;
 
 % build structure of force files
-for i = n_force_folders:-1:1
+for i = 1:n_force_folders
+    
     % files for iteration
     fc_iter_files = dir(fullfile(...
-        pwd,...
-        data_folder,...
-        PecanDataMaster_folders(force_file_ind(i)).name,'*.tdms'));
+        data_path,...
+        'Pecan_Data-Force_Files',...
+        force_folders(i).name,'*.tdms'));
     
     % n files for iteration
-    n_fc_iter_files = size(fc_iter_files,1);
+    n_fc_iter_files = numel(fc_iter_files);
     
     % force iteration start index
     fc_iter_si = 1+fc_files_running_sum;
@@ -272,7 +155,7 @@ for i = n_force_folders:-1:1
 end
 
 % number of force files
-n_force_files = length(force_files);
+n_force_files = numel(force_files);
 
 % initialize and preallocate
 pecan_test_metadata = cell(n_force_files,1);
@@ -285,12 +168,23 @@ force_end_ind = 0;
 
 % get metadata for all force files
 for i = 1:n_force_files
-    pecan_test_metadata(i) = {force_files(i).name(24:71)};
-    pecan_configuration_time(i) = time_unix(force_files(i).name(8:22));
-    pecan_test_time(i) = time_unix(append(...
-        force_files(i).name(8:16),...
-        force_files(i).name(1:6)));
-    pecan_test_id(i) = {force_files(i).name(73:82)};
+    
+    % parse force file name
+    force_name_parse = strsplit(force_files(i).name,'-');
+    
+    % set pecan configation time
+    pecan_configuration_time(i) = time_unix(char(force_name_parse{2}));
+    
+    % parse pecan configuration time
+    pct_parse = strsplit(char(force_name_parse{2}),'_');
+    
+    % get pecan test time
+    s = {char(pct_parse{1}),force_name_parse{1}};
+    pecan_test_time(i) = time_unix([sprintf('%s_',s{1:end-1}),s{end}]);
+    
+    s = {force_name_parse{3},force_name_parse{4},force_name_parse{5},force_name_parse{6}};
+    pecan_test_metadata(i) = {[sprintf('%s-',s{1:end-1}),s{end}]};
+    pecan_test_id(i) = {force_name_parse(7)};
 end
 
 % initialize/preallocate number of files deleted
@@ -301,9 +195,6 @@ i = 1;
 while true
     % delete entry if the size is incorrect
     if force_files(i).bytes<1e3
-        % delete file
-        delete(fullfile(force_files(i).folder,force_files(i).name));
-        % remove tracking data
         force_files(i) = [];
         pecan_test_metadata(i) = [];
         pecan_configuration_time(i) = [];
@@ -313,7 +204,7 @@ while true
     else
         i = i+1;
     end
-
+    
     % if the index is the last index, break the statement
     if i > size(force_files,2)
         break
@@ -336,9 +227,6 @@ pecan_configuration_time = pecan_configuration_time(I_sort_only_force);
 % array of timestamps for all files, including with force files
 time_stamps_aggregate_force = [time_stamps_pre_crack;time_stamps_post_crack;...
     time_stamps_uncracked;time_stamps_diseased;pecan_test_time];
-
-% array of sizes of different sections of sort array
-n_pecan_sizes = [n_pecan_pre_crack;n_pecan_post_crack;n_pecan_uncracked;n_pecan_diseased;n_force_files];
 
 % sorted time stamp array
 [tsaf_sort, I_sort_force] = sort(time_stamps_aggregate_force);

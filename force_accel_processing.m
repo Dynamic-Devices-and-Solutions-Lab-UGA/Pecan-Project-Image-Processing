@@ -29,6 +29,9 @@ names = fieldnames(TDMS_Struct);
 force = force_accel_calibration(getfield(TDMS_Struct,names{2},...
     'Dev2_1_ai0','data'),'force');
 
+% select only first 75 ms of data
+force = force(750);
+
 % error handling if force is empty
 if isempty(force)
     force = zeros(5000,1);
