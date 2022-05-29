@@ -11,9 +11,6 @@ function [force,max_force] = force_accel_processing(path)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clc;  % Clear command window.
-workspace;  % Make sure the workspace panel is showing.
-
 % construct full path
 currentFolder = pwd;
 FullFileName = fullfile(currentFolder,path);

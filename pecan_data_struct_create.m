@@ -8,16 +8,17 @@
 % pecan_data_clean -> pecan_data_struct_create
 %
 % Author: Dani Agramonte
-% Last Updated: 05.06.22
+% Last Updated: 05.29.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialize MATLAB
 tic; % begin timing script
 
-clear; % Clear variables
-% clc;  % Clear command window.
+clear variables; % Clear variables
+clear('textprogressbar'); % clear persistent vars in textprogressbar
 workspace;  % Make sure the workspace panel is showing.
+commandwindow();
 
 %% Post-Initialize MATLAB
 
@@ -186,17 +187,11 @@ textprogressbar('terminated');
 
 % array of timestamps for all files
 time_stamps_aggregate = [time_stamps_pre_crack;time_stamps_post_crack;...
-    time_stamps_uncracked;time_stamps_diseased];
+    time_stamps_uncracked];
 
 % sorted time stamp array 
-[test, I_sort] = sort(time_stamps_aggregate);
+[~, I_sort] = sort(time_stamps_aggregate);
 
-% get array of post crack indices
-I_sort_post_crack = zeros(n_pecan_post_crack,1);
-
-for i = 1:n_pecan_post_crack
-    I_sort_post_crack(i) = find(I_sort == (n_pecan_pre_crack+i));
-end
 
 % initialize sum of I_config_size
 I_config_size_running_sum = sum(I_config_size(1:(end-1)));
@@ -224,7 +219,7 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
         while true
             % check to see if ind is in bounds 
             if all_pre_crack_ind_i(j)+k <= n_pecan_pre_crack...
-                    +n_pecan_post_crack+n_pecan_uncracked+n_pecan_diseased
+                    +n_pecan_post_crack+n_pecan_uncracked
                 % figure out what the next image is
                 ind = I_sort(all_pre_crack_ind_i(j)+k);
                 
@@ -276,22 +271,6 @@ for i = (size(pecan_test_meta_data_unique,1)):-1:1
                     
                     pecan_data_struct(i).test(j).result(k-1) = ...
                         {'Unsuccessful Crack'};
-                    break
-                elseif (((n_pecan_pre_crack+n_pecan_post_crack+...
-                        n_pecan_uncracked+1) <= ind)&&((...
-                        n_pecan_pre_crack+n_pecan_post_crack+...
-                        n_pecan_uncracked+n_pecan_diseased) >= ind))
-                    
-                    % calculate diseased ind
-                    diseased_ind = ind-n_pecan_pre_crack-n_pecan_post_crack-n_pecan_uncracked;
-                    
-                    % get file and store in structure
-                    pecan_data_struct(i).test(j).post_crack_data.file = ...
-                        fullfile(diseased_files(diseased_ind).folder,...
-                        diseased_files(diseased_ind).name);
-                    
-                    pecan_data_struct(i).test(j).result(k-1) = ...
-                        {'Diseased Pecan'};
                     break
                 elseif (1 <= ind)&&(n_pecan_pre_crack >= ind)
                     break
