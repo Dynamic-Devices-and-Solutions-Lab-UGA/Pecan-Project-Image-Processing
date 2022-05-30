@@ -3,6 +3,9 @@
 % 
 % Compare direct area method, bounding box, and calibrated surface methods
 %
+% pecan_calib_surface_data_create -> PHE_calibration_function_create -> PHE (function) ...
+% -> pecan_method_comparison -> pecan_method_comparison_plot
+%
 % Author: Dani Agramonte
 % Last Updated: 04.28.22
 %
@@ -15,7 +18,8 @@ clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
 % load in method comparison data
-load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\PMC_Data.mat','pecan_method_comp')
+load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Calibration_Data\PMC_Data.mat'],'pecan_method_comp')
 
 %% Plot
 
@@ -28,9 +32,9 @@ hcda = histcounts(pecan_method_comp(:,2),[binRange Inf]);
 hccs = histcounts(pecan_method_comp(:,3),[binRange Inf]);
 
 % fit burr distributions
-burr_bb = fitdist(pecan_method_comp(:,1),'burr');
-burr_da = fitdist(pecan_method_comp(:,2),'burr');
-burr_cs = fitdist(pecan_method_comp(:,3),'burr');
+burr_bb = fitdist(pecan_method_comp(:,1),'Weibull');
+burr_da = fitdist(pecan_method_comp(:,2),'Weibull');
+burr_cs = fitdist(pecan_method_comp(:,3),'Weibull');
 
 % plot distributions with bar graph
 figure(1)

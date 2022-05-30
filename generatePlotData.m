@@ -28,13 +28,14 @@ load(data_path)
 %                                                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[var_out,fit,g] = getHSlice(15,'Steel',pecan_data_struct);
+[var_out,fit,g] = getHSlice(45,'Steel',pecan_data_struct);
 
 X = var_out(:,1);
 Y = var_out(:,2);
 Z = var_out(:,3);
 
 h = plot(fit,[X Y],Z);
+zlim([0 100])
 
 legend( h, 'untitled fit 1', 'Z vs. X, Y', 'Location', 'NorthEast', 'Interpreter', 'none' );
 % Label axes

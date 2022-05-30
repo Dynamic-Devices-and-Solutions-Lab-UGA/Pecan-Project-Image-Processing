@@ -13,6 +13,9 @@ clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
+% set focus to command window
+commandwindow();
+
 %% main
 
 % main data path
@@ -51,7 +54,7 @@ CmdWinTool('JPosition',[current_pos(1:2) screen_width/2 screen_height]);
 
 % start index
 % ind_start = 1500;
-ind_start = 1;
+ind_start = 80;
 
 try
     for i = ind_start:numel(imPaths)
@@ -60,6 +63,7 @@ try
 
         % run pecan property get in debug mode
         pecan_property_get(imLocalPath,'debug','true','delay_figure','true');
+        commandwindow();
         
         % get handle for current figure
         h = gcf;

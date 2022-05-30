@@ -79,26 +79,25 @@ elseif ~((im_dims(1) == 1960)&&(im_dims(2) == 4032))
 end
 
 % crop image
-I = imcrop(I_raw,[1500 150 1500 950]);
+imStep1 = imcrop(I_raw,[1500 150 1500 950]);
 
-% binarize image 
-X = imbinarize(I,'adaptive','Sensitivity',0.7);
+% convert to grayscale
+imStep2 = rgb2gray(imStep1);
 
-% read green channel
-bw = ~X(:,:,2);
+% binarize image and invert to create mask
+imStep3 = ~imbinarize(imStep2,'adaptive','Sensitivity',0.7);
 
-% create a morphological structural element
-SE  = strel('Disk',4);
+% perform light opening operation to remove noise
+imStep4 = imopen(imStep3,strel('Disk',1));
 
-% close the image with the previously generated morphological structural
-% element
-bw = imclose(bw, SE);
+% perform closing operation
+imStep5 = imclose(imStep4,strel('Disk',7));
 
-% fill any remaining holes in the image
-bw = imfill(bw,'holes');
+% fill in remaining holes in image
+imStep6 = imfill(imStep5,8,'holes');
 
 % filter out every object except for the largest one
-bw = bwareafilt(bw,1);
+bw = bwareafilt(imStep6,1);
 
 % find the area of the projected pecan
 s = regionprops(bw,'ConvexArea','BoundingBox','Eccentricity','Extent');
@@ -134,8 +133,8 @@ if params.debug
         drawnow;
     end
     
-    imshow(I,'Parent',ax)
-    showMaskAsOverlay(0.5,bw,'r')
+    imshow(imStep1,'Parent',ax)
+    showMaskAsOverlay(0.15,bw,'r')
     
     if params.bounding_box
         hold on

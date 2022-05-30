@@ -4,6 +4,9 @@
 % load in calibration data and calculate necessary information so that
 % calibration curves can be generated in 
 %
+% pecan_calib_surface_data_create -> PHE_calibration_function_create -> PHE (function) ...
+% -> pecan_method_comparison -> pecan_method_comparison_plot
+%
 % Author: Dani Agramonte
 % Last Updated: 05.06.22
 %
@@ -13,6 +16,7 @@
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
+clear('textprogressbar'); % clear persistent vars in textprogressbar
 
 % set debug parameter
 debug = 'false'; % valid values are 'true' or 'false'
@@ -88,8 +92,9 @@ end
 
 %% Populate calibration data matrix
 
+textprogressbar(pad('populating calibration matrix:',60));
 for i = 1:n_pecan_post_crack
-    disp(i)
+    textprogressbar(100*(i/n_pecan_post_crack));
     % get post crack index and filename
     post_crack_ind = I_sort(I_sort_post_crack(i))-n_pecan_pre_crack;
     post_crack_file = fullfile(...
@@ -153,6 +158,7 @@ for i = 1:n_pecan_post_crack
     pecan_calibration_data(i,4) = pre_crack_ecc;
     pecan_calibration_data(i,5) = pre_crack_ext;
 end
+textprogressbar('terminated');
 
 %% Shutdown tasks
 
@@ -161,6 +167,9 @@ save(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
     'Pecan_Calibration_Data\'...
     'Pecan_Calibration_Data_Main.mat'],'pecan_calibration_data');
 
-% clear data
-clear; % Clear variables
-clc;  % Clear command window.
+switch debug
+    case 'false'
+        % clear data
+        clear; % Clear variables
+        clc;  % Clear command window.
+end

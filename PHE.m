@@ -10,6 +10,9 @@ function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
 % the meat by this same factor. After doing so, compare this area with the
 % area of the query pecan half
 %
+% pecan_calib_surface_data_create -> PHE_calibration_function_create -> PHE (function) ...
+% -> pecan_method_comparison -> pecan_method_comparison_plot
+%
 % Inputs
 % ---------------
 % pre_crack_path       : path of image before the crack. Can be relative or
@@ -90,7 +93,8 @@ switch params.method
     case 2 % calibration surface method
         
         % load in calibrated surface fit
-        load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\PHE_calibration_sfit.mat','calib_surf');
+        load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+            'Pecan_Calibration_Data\PHE_calibration_sfit.mat'],'calib_surf');
         
         % predicted ideal area of peacn half
         predicted_ideal_area = calib_surf(pre_crack_ecc,pre_crack_ext)*query_pre_crack_area;

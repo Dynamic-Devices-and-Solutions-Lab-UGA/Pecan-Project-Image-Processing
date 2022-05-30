@@ -3,6 +3,9 @@
 % 
 % Compare different methods of calculating post crack area
 %
+% pecan_calib_surface_data_create -> PHE_calibration_function_create -> PHE (function) ...
+% -> pecan_method_comparison -> pecan_method_comparison_plot
+%
 % Author: Dani Agramonte
 % Last Updated: 05.06.22
 %
@@ -13,6 +16,7 @@
 clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
+clear('textprogressbar'); % clear persistent vars in textprogressbar
 
 % set debug parameter
 debug = 'false'; % valid values are 'true' or 'false'
@@ -88,10 +92,10 @@ end
 
 %% Populate PHE Comparison matrix
 
+textprogressbar(pad('populating comparison matrix:',60));
 % use bounding box method
 for i = 1:n_pecan_post_crack
-    % display iteration for debugging purposes
-    disp(i)
+     textprogressbar(100*(i/n_pecan_post_crack));
     
     % get post crack index and filename
     post_crack_ind = I_sort(I_sort_post_crack(i))-n_pecan_pre_crack;
@@ -124,11 +128,13 @@ for i = 1:n_pecan_post_crack
     [pecan_method_comp(i,3),~,~,~,~,~,~] = PHE(pre_crack_file,post_crack_file,...
         'method','calib_surf');
 end
+textprogressbar('terminated');
 
 %% Shutdown tasks
 
 % save data to .mat file
-save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Calibration_Data\PMC_Data.mat','pecan_method_comp');
+save(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Calibration_Data\PMC_Data.mat'],'pecan_method_comp');
 
 % clear data
 clear; % Clear variables
