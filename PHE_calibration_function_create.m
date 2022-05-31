@@ -60,10 +60,9 @@ ax.FontSize = fontsize;
 xlabel('Eccentricity','FontSize',fontsize)
 ylabel('Extent','FontSize',fontsize)
 zlabel('Calibration Ratio,$\frac{A_{poc}}{A_{prc}}$','FontSize',fontsize)
-set(gcf,'color','white')
-
 title('$\Gamma(e_0,e_1)$','FontSize',fontsize)
 
+set(gcf,'color','white')
 %% Shutdown tasks
 
 % save 

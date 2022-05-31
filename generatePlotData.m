@@ -11,7 +11,7 @@
 
 %% Initialize MATLAB
 
-clear variables; % Clear variables
+%clear variables; % Clear variables
 workspace;  % Make sure the workspace panel is showing.
 commandwindow();
 
@@ -28,25 +28,61 @@ load(data_path)
 %                                                                                                 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-[var_out,fit,g] = getHSlice(45,'Steel',pecan_data_struct);
+angleFix = 30;
+materialFix = 'Steel';
 
-X = var_out(:,1);
-Y = var_out(:,2);
-Z = var_out(:,3);
+% get fits
+[var_out1,PecanMeatIntegrity_sfit,g1] = getHSlice(angleFix,materialFix,pecan_data_struct,'P');
+[var_out2,PecanShellability_sfit,g2] = getHSlice(angleFix,materialFix,pecan_data_struct,'S');
 
-h = plot(fit,[X Y],Z);
-zlim([0 100])
+% data for opts = 'P'
+X1 = var_out1(:,1);
+Y1 = var_out1(:,2);
+Z1 = var_out1(:,3);
+w1 = var_out1(:,4);
+
+% data for opts = 'S' 
+X2 = var_out2(:,1);
+Y2 = var_out2(:,2);
+Z2 = var_out2(:,3);
+w2 = var_out2(:,4);
+
+figure;
+h = plot(PecanMeatIntegrity_sfit,[X1 Y1],Z1);
+hold on
+h2 = plot(PecanShellability_sfit,[X2 Y2],Z2);
+zlim([0 105])
 
 legend( h, 'untitled fit 1', 'Z vs. X, Y', 'Location', 'NorthEast', 'Interpreter', 'none' );
 % Label axes
-xlabel( 'X', 'Interpreter', 'none' );
-ylabel( 'Y', 'Interpreter', 'none' );
-zlabel( 'Z', 'Interpreter', 'none' );
+xlabel('Mass [g]', 'Interpreter', 'none' );
+ylabel('Height [cm]', 'Interpreter', 'none' );
+zlabel('Z', 'Interpreter', 'none' );
 grid on
 
+lb = [min(X1), min(Y1)];
+ub = [max(X1), max(Y1)];
+
+% home folder
+folder_loc = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Surface_Fits';
+
+% file name
+name = sprintf('PecanSurfaceFits-Angle.%d-Material.%s.mat',angleFix,materialFix);
+
+% save data
+save(fullfile(folder_loc,name),'PecanMeatIntegrity_sfit','PecanShellability_sfit','lb','ub')
 
 
-function [var,fitresult, gof] = getHSlice(angleFix,materialFix,pecan_data_struct)
+
+function [var,fitresult,gof] = getHSlice(angleFix,materialFix,pecan_data_struct,opts)
+
+if strcmp(opts,'S')
+    param = 0;
+elseif strcmp(opts,'P')
+    param = 1;
+else
+    error('Invalid value for ''opts''')
+end
 
 % valid angles
 validAngles = [15 30 45];
@@ -65,6 +101,7 @@ end
 M = zeros(5e4,1);
 H = zeros(5e4,1);
 P = zeros(5e4,1);
+S = zeros(5e4,1);
 
 % extract from datastructure
 start_shift = 0;
@@ -80,7 +117,8 @@ for i = 1:numel(pecan_data_struct)
             % set values
             M(ind_start:ind_stop) = pecan_data_struct(i).metadata.Mass;
             H(ind_start:ind_stop) = pecan_data_struct(i).metadata.Height;
-            P(ind_start:ind_stop) = pecan_data_struct(i).test(j).post_crack_data.half(1:2).perc;
+            P(ind_start:ind_stop) = [pecan_data_struct(i).test(j).post_crack_data.half(1:2).perc];
+            S(ind_start:ind_stop) = 100*ceil([pecan_data_struct(i).test(j).post_crack_data.half(1:2).perc]./100);
         end
         
         start_shift = start_shift+2*numel(pecan_data_struct(i).test);
@@ -91,10 +129,22 @@ end
 M(((ind_stop+1):end)) = [];
 H(((ind_stop+1):end)) = [];
 P(((ind_stop+1):end)) = [];
+S(((ind_stop+1):end)) = [];
 
-% find average P values
-[matOut, ~, uidx] = unique([H(:), M(:)], 'rows');
-avgP = accumarray(uidx, P(:), [], @mean);
+if param
+    
+    % delete zero values
+    H(P == 0) = [];
+    M(P == 0) = [];
+    P(P == 0) = [];
+    
+    % find average P values
+    [matOut, ~, uidx] = unique([H(:),M(:)], 'rows');
+    avgP = accumarray(uidx, P(:), [], @mean);
+else
+    [matOut, ~, uidx] = unique([H(:),M(:)], 'rows');
+    avgS = accumarray(uidx, S(:), [], @mean);
+end
 
 % assign matrices to their proper variables
 H = matOut(:,1);
@@ -103,20 +153,32 @@ M = matOut(:,2);
 % find weights by taking into consideration number of tests
 w = groupcounts(uidx);
 
-% call LowessFit to get actual results
-[fitresult, gof] = LowessFit(M,H,avgP,w);
-
-% assign vars out
-var = [M,H,avgP];
-
+if param
+    % call LowessFit to get actual results
+    [fitresult, gof] = LouessFit(M,H,avgP,w,'lowess');
+    
+    % assign vars out
+    var = [M,H,avgP,w];
+else
+    % call LowessFit to get actual results
+    [fitresult, gof] = LouessFit(M,H,avgS,w,'loess');
+    
+    % assign vars out
+    var = [M,H,avgS,w];
+end
 end
 
-function [fitresult, gof] = LowessFit(X1,X2,X3,w)
+function [fitresult, gof] = LouessFit(X1,X2,X3,w,opts)
+
+if ~(strcmp(opts,'loess')||strcmp(opts,'lowess'))
+    error('Invalid value for ''opts''')
+end
+
 % prepreparation of data
 [xData,yData,zData,weights] = prepareSurfaceData(X1,X2,X3,w);
 
 % Set up fittype and options.
-ft = fittype('loess');
+ft = fittype(opts);
 opts = fitoptions('Method','LowessFit');
 opts.Normalize = 'on';
 opts.Robust = 'Bisquare';
@@ -157,6 +219,7 @@ M = zeros(5e4,1);
 H = zeros(5e4,1);
 P = zeros(5e4,1);
 A = zeros(5e4,1);
+S = zeros(5e4,1);
 
 % possible set of angles
 angleSet = [15,30,45];
@@ -178,6 +241,7 @@ for k = 1:3
                 M(ind_start:ind_stop) = pecan_data_struct(i).metadata.Mass;
                 H(ind_start:ind_stop) = pecan_data_struct(i).metadata.Height;
                 P(ind_start:ind_stop) = pecan_data_struct(i).test(j).post_crack_data.half(1:2).perc;
+                S(ind_start:ind_stop) = 100*ceil(pecan_data_struct(i).test(j).post_crack_data.half(1:2).perc/100);
                 A(ind_start:ind_stop) = pecan_data_struct(i).metadata.Angle;
             end
 
@@ -191,6 +255,7 @@ M(((ind_stop+1):end)) = [];
 H(((ind_stop+1):end)) = [];
 P(((ind_stop+1):end)) = [];
 A(((ind_stop+1):end)) = [];
+S(((ind_stop+1):end)) = [];
 
 % tranformed coordate system
 [V,E] = coordTrans(M,H);
@@ -217,13 +282,13 @@ wV = groupcounts(uidxV);
 
 if flag
     % call LowessFit to get actual results
-    [fitresult, gof] = LowessFit(E_uniq,AE_uniq,avgPE,wE);
+    [fitresult, gof] = LouessFit(E_uniq,AE_uniq,avgPE,wE);
     
     % assign vars out
     var = [E_uniq,AE_uniq,avgPE];
 else
     % call LowessFit to get actual results
-    [fitresult, gof] = LowessFit(V_uniq,AV_uniq,avgPV,wV);
+    [fitresult, gof] = LouessFit(V_uniq,AV_uniq,avgPV,wV);
     % assign vars out
     var = [V_uniq,AV_uniq,avgPV];
 end

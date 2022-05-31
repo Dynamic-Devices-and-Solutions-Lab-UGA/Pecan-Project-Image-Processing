@@ -1,4 +1,4 @@
-function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
+function [perc,query_pre_crack_length,query_pre_crack_width,pre_crack_bw,post_crack_bw,...
     pre_crack_area,post_crack_area] = PHE(pre_crack_path,...
     post_crack_path,varargin)
 
@@ -56,8 +56,8 @@ function [perc,query_length,query_width,pre_crack_bw,post_crack_bw,...
 % Try to get pecan data from two image paths
 
 % try to use absolute path
-[query_pre_crack_area,query_length,query_width,bounding_box_query,bw_pre_crack_query,...
-    pre_crack_ecc,pre_crack_ext] = pecan_property_get(pre_crack_path);
+[query_pre_crack_area,query_pre_crack_length,query_pre_crack_width,bounding_box_query,...
+    bw_pre_crack_query,pre_crack_ecc,pre_crack_ext] = pecan_property_get(pre_crack_path);
 pre_crack_bw = bw_pre_crack_query;
 pre_crack_area = query_pre_crack_area;
 
@@ -69,38 +69,22 @@ post_crack_area = query_post_crack_area;
 switch params.method
     case 0 % bounding box method
         
-        % get reference values for area, length, and width
-        [~,ref_length,ref_width,bounding_box_ref,bw_pre_crack_ref,~,~] = ...
-            pecan_property_get(...
-            'Pecan_Reference_Images/20220323_133233.jpg');
-        [ref_post_crack_area,~,~,~,bw_post_crack_ref,~,~] = ...
-            pecan_property_get(...
-            'Pecan_Reference_Images/20220323_133327.jpg');
-        perc = 100*query_post_crack_area/((query_length/ref_length)*...
-            (query_width/ref_width)*ref_post_crack_area);
+        % call gamma 1
+        perc = Gamma_1(query_pre_crack_area,query_post_crack_area,...
+            ref_pre_crack_width,ref_pre_crack_length,...
+            ref_post_crack_width,ref_post_crack_length);
         
     case 1 % direct area method with reference pecan
         
-        % get reference values for area, length, and width
-        [ref_pre_crack_area,~,~,bounding_box_ref,bw_pre_crack_ref,~,~] = ...
-            pecan_property_get(...
-            'Pecan_Reference_Images/20220323_133233.jpg');
-        [ref_post_crack_area,~,~,~,bw_post_crack_ref,~,~] = ...
-            pecan_property_get(...
-            'Pecan_Reference_Images/20220323_133327.jpg');
-        perc = 100*query_post_crack_area/((ref_post_crack_area/...
-            ref_pre_crack_area)*query_pre_crack_area);
+        % call gamma 2
+        perc = Gamma_2(query_pre_crack_area,query_post_crack_area,...
+            ref_pre_crack_area,ref_post_crack_area);
+        
     case 2 % calibration surface method
         
-        % load in calibrated surface fit
-        load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-            'Pecan_Calibration_Data\PHE_calibration_sfit.mat'],'calib_surf');
-        
-        % predicted ideal area of peacn half
-        predicted_ideal_area = calib_surf(pre_crack_ecc,pre_crack_ext)*query_pre_crack_area;
-        
-        % percent half estimate
-        perc = 100*query_post_crack_area/predicted_ideal_area;
+        % call gamma 3
+        perc = Gamma_3(pre_crack_ecc,pre_crack_ext,...
+            query_pre_crack_area,query_post_crack_area);
 end
 
 if params.pre_cracked_bw
@@ -213,5 +197,50 @@ while ~isempty(varargin)
 end % while
 
 end % parseinputs
+
+% direct area method
+function perc = Gamma_1(query_pre_crack_area,query_post_crack_area,ref_pre_crack_width,ref_pre_crack_length,...
+        ref_post_crack_width,ref_post_crack_length)
+
+% calculate areas of bounding boxes
+ref_prc_area = ref_pre_crack_width*ref_pre_crack_length;
+ref_poc_area = ref_post_crack_width*ref_post_crack_length;
+
+% calulcate fixed ratio
+ratioIdeal = ref_poc_area/ref_prc_area;
+
+% estimate of ideal post crack area
+pcAreaEstIdeal = ratioIdeal*query_pre_crack_area;
+
+% estimate integrity
+perc = 100*query_post_crack_area/pcAreaEstIdeal;
+
+end
+
+function perc = Gamma_2(query_pre_crack_area,query_post_crack_area,ref_pre_crack_area,ref_post_crack_area) 
+
+% calulcate fixed ratio
+ratioIdeal = ref_post_crack_area/ref_pre_crack_area;
+
+% estimate of ideal post crack area
+pcAreaEstIdeal = ratioIdeal*query_pre_crack_area;
+
+% estimate integrity
+perc = 100*query_post_crack_area/pcAreaEstIdeal;
+
+end
+
+function perc = Gamma_3(pre_crack_ecc,pre_crack_ext,query_pre_crack_area,query_post_crack_area)
+
+% load in calibrated surface fit
+load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
+    'Pecan_Calibration_Data\PHE_calibration_sfit.mat'],'calib_surf');
+
+% predicted ideal area of pecan half
+pcAreaEstIdeal = calib_surf(pre_crack_ecc,pre_crack_ext)*query_pre_crack_area;
+
+% estimate integrity
+perc = 100*query_post_crack_area/pcAreaEstIdeal;
+end
 
 end
