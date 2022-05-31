@@ -10,7 +10,7 @@
 
 %% Initialize MATLAB
 
-clear variables; % Clear variables
+% clear variables; % Clear variables
 workspace;  % Make sure the workspace panel is showing.
 commandwindow();
 
@@ -23,7 +23,7 @@ name = 'pecanMultiObjectiveWeightStudy-Angle.30-Material.Steel.mat';
 % set path of where data is located
 data_path = fullfile(folder,name);
 
-load(data_path,'x1','x2','sol','solval');
+load(data_path,'sol','solval');
 
 %% Main script
 
@@ -40,7 +40,7 @@ massOpt = permute(sol(1,:,:),[2 3 1]);
 heightOpt = permute(sol(2,:,:),[2 3 1]);
 
 
-[X1,X2] = meshgrid(x1,x2);
+[X1,X2] = meshgrid(X1,X2);
 figure(1)
 surf(X1,X2,pecanIntegrity,pecanShellability)
 xlabel('weight of pecan integrity')

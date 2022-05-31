@@ -51,16 +51,20 @@ x02 = 58*ones(n_study,n_study);
 % size of window - tune if necessary
 s = 5;
 
+% define params from initial user input
+params.Angle = fixAngle;
+params.Material = fixMaterial;
+
 textprogressbar(pad('Completing Parameter Study:',60));
 for i = n_study:-1:1
     for j = n_study:-1:1
         % estimate current progress
         prog_track = (i-1)*n_study+j;
         total_iter = n_study^2;
-        textprogressbar(100*(prog_track/total_iter));
+        textprogressbar(100-100*(prog_track/total_iter),'backwards');
         
         % find optimum value
-        [sol(i,j,:),solval(i,j,:)] = pecanMultiobjectiveOptim([w1(i),w2(j)],[x01(i,j),x02(i,j)]);
+        [sol(i,j,:),solval(i,j,:)] = pecanMultiobjectiveOptim([w1(i),w2(j)],[x01(i,j),x02(i,j)],params);
         
         % set initial values in x01 and x02 equal to sol 
         x01(i,j) = sol(i,j,1);
@@ -76,8 +80,8 @@ for i = n_study:-1:1
         zerosMorph = imdilate(zerosInd,strel('square',s));
         
         % average out values 
-        x01(zerosMorph) = (zerosMorph*sol(i,j,1)+x01(zerosMorph))/2;
-        x02(zerosMorph) = (zerosMorph*sol(i,j,2)+x02(zerosMorph))/2;
+        x01(logical(zerosMorph)) = (zerosMorph(logical(zerosMorph))*sol(i,j,1)+x01(logical(zerosMorph)))/2;
+        x02(logical(zerosMorph)) = (zerosMorph(logical(zerosMorph))*sol(i,j,2)+x02(logical(zerosMorph)))/2;
     end
 end
 textprogressbar('terminated');
@@ -93,6 +97,6 @@ name = sprintf('pecanMultiObjectiveWeightStudy-Angle.%d-Material.%s.mat',fixAngl
 % set path of where data is located
 data_path = fullfile(folder,name);
 
-save(data_path,'x1','x2','sol','solval');
+save(data_path,'w1','w2','sol','solval');
 
 runTime = toc; % finish timing script
