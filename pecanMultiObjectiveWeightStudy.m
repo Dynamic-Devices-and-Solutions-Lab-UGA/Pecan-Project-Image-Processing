@@ -25,7 +25,7 @@ fixAngle = 30;
 fixMaterial = 'Steel';
 
 % size of study - square this value for number of points
-n_study = 100;
+n_study = 40;
 
 % smallest weight to consider
 w_start = 0.1;
