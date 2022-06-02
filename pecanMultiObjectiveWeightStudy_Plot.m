@@ -67,7 +67,7 @@ grid(ax,'on');
 hold(ax,'off');
 set(gcf,'Position',[241 201 1452 755])
 
-
+%{
 figure(2)
 [X1,X2] = meshgrid(w1,w2);
 surf(X1,X2,pecanIntegrity,pecanShellability)
@@ -124,3 +124,4 @@ grid(ax,'on');
 hold(ax,'off');
 title('Pareto optimal surface in codomain when Angle=30 and Material=Steel','FontSize',fontsize)
 set(gcf,'Position',[241 201 1452 755])
+%}

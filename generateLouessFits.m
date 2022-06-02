@@ -47,19 +47,52 @@ Y2 = var_out2(:,2);
 Z2 = var_out2(:,3);
 w2 = var_out2(:,4);
 
-figure;
-h = plot(PecanMeatIntegrity_sfit,[X1 Y1],Z1);
-hold on
-h2 = plot(PecanShellability_sfit,[X2 Y2],Z2);
+h1 = figure;
+plot(PecanMeatIntegrity_sfit,[X1 Y1],Z1);
+
+% set background to white
+set(gcf,'color','white')
+
+% specify zlimits
 zlim([0 105])
 
-legend( h, 'untitled fit 1', 'Z vs. X, Y', 'Location', 'NorthEast', 'Interpreter', 'none' );
+% specify colormap
+colormap(jet)
+
 % Label axes
-xlabel('Mass [g]', 'Interpreter', 'none' );
-ylabel('Height [cm]', 'Interpreter', 'none' );
-zlabel('Z', 'Interpreter', 'none' );
+xlabel('Mass $[g]$');
+ylabel('Height $[cm]$');
+zlabel('Pecan Integrity, $\Psi [\%]$');
+
+% specify title
+
+
+% turn grid on
 grid on
 
+h2 = figure;
+
+% plot surface
+plot(PecanShellability_sfit,[X2 Y2],Z2);
+
+% set background to white
+set(gcf,'color','white')
+
+% specify zlimits
+zlim([0 105])
+
+% specify colormap
+colormap(jet)
+
+% Label axes
+xlabel('Mass $[g]$');
+ylabel('Height $[cm]$');
+zlabel('Pecan Shellability, $\Xi [\%]$');
+
+% turn grid on
+grid on
+
+% calculate upper and lower bounds for m and
 lb = [min(X1), min(Y1)];
 ub = [max(X1), max(Y1)];
 
