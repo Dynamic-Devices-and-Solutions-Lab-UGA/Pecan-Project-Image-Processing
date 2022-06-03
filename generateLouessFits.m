@@ -60,12 +60,13 @@ zlim([0 105])
 colormap(jet)
 
 % Label axes
-xlabel('Mass $[g]$');
-ylabel('Height $[cm]$');
+xlabel('Mass [kg]');
+ylabel('Height [m]');
 zlabel('Pecan Integrity, $\Psi [\%]$');
 
 % specify title
-
+paramTitle = sprintf('Sampling of $V$-$E$ Parameter space: Material = %s,  $\\phi$  = %2d$^{\\circ}$',materialFix,angleFix);
+title(paramTitle)
 
 % turn grid on
 grid on
