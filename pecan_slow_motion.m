@@ -16,9 +16,7 @@ workspace;  % Make sure the workspace panel is showing.
 %% Post-Initialization of MATLAB
 
 % set path of where data is located
-data_path = ['C:\Users\Dani\Documents\'...
-    'Pecan-Project-Image-Processing\'...
-    'Pecan_Video_Data_Master'];
+data_path = fullfile(projectPath,'Pecan_Video_Data_Master')];
 
 %% Variable Definitions
 

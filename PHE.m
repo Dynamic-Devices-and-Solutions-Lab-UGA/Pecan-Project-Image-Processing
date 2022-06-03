@@ -233,8 +233,7 @@ end
 function perc = Gamma_3(pre_crack_ecc,pre_crack_ext,query_pre_crack_area,query_post_crack_area)
 
 % load in calibrated surface fit
-load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Calibration_Data\PHE_calibration_sfit.mat'],'calib_surf');
+load(fullfile(projectPath,'Pecan_Calibration_Data\PHE_calibration_sfit.mat'),'calib_surf');
 
 % predicted ideal area of pecan half
 pcAreaEstIdeal = calib_surf(pre_crack_ecc,pre_crack_ext)*query_pre_crack_area;

@@ -15,8 +15,7 @@ clc;  % Clear command window.
 commandwindow();
 
 % set path of where data is located
-data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Data_Master\pecan_data_struct.mat'];
+data_path = fullfile(projectPath,'Pecan_Data_Master\pecan_data_struct.mat');
 
 load(data_path)
 

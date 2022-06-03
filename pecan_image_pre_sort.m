@@ -18,18 +18,8 @@ workspace;  % Make sure the workspace panel is showing.
 
 % pecan image processing folder - this is where all images are located pre
 % sort
-pre_sort_loc = ['C:\Users\Dani\Documents\'...
-    'Pecan-Project-Image-Processing\'...
-    'Pecan_Data_Master\'...
-    'Pecan_Data-20220526_145147\'...
-    'Pecan_Data-Image_Files'];
-
-% image directory
-im_dir = ['C:\Users\Dani\Documents\'...
-    'Pecan-Project-Image-Processing\'...
-    'Pecan_Data_Master\'...
-    'Pecan_Data-20220526_145147\'...
-    'Pecan_Data-Image_Files'];
+im_dir = fullfile(projectPath,...
+    'Pecan_Data_Master\Pecan_Data-20220526_145147\Pecan_Data-Image_Files');
 
 % set locations for destination
 prc_loc = fullfile(im_dir,'Pre_Crack');
@@ -38,7 +28,7 @@ dd_loc = fullfile(im_dir,'Diseased');
 uc_loc = fullfile(im_dir,'Uncracked');
 
 % pre sort location files
-psl_files = dir(pre_sort_loc);
+psl_files = dir(im_dir);
 
 % delete directories
 psl_files([psl_files.isdir]) = [];

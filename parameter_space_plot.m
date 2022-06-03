@@ -16,8 +16,7 @@ workspace;  % Make sure the workspace panel is showing.
 commandwindow();
 
 % set path of where data is located
-data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Data_Master\pecan_data_struct.mat'];
+data_path = fullfile(projectPath,'Pecan_Data_Master\pecan_data_struct.mat');
 
 load(data_path)
 
@@ -134,7 +133,7 @@ paramTitle = sprintf('Sampling of $M$-$H$ Parameter space: Material = %s,  $\\ph
 title(paramTitle)
 set(gcf,'color','white')
 % store file with export_fig
-store_loc = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Figures';
+store_loc = fullfile(projectPath,'Figures');
 filename = sprintf('Sample-ParameterSpace.MH-Material.%s-Angle.%d.eps',materialFix,angleFix);
 export_fig(h1,fullfile(store_loc,filename));
 
@@ -155,7 +154,7 @@ view(gca,[0 90]);
 grid off
 box on
 % store file with export_fig
-store_loc = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Figures';
+store_loc = fullfile(projectPath,'Figures');
 filename = sprintf('Sample-ParameterSpace.VE-Material.%s-Angle.%d.eps',materialFix,angleFix);
 export_fig(h2,fullfile(store_loc,filename));
 

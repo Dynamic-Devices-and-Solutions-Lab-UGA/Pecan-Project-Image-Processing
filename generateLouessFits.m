@@ -16,8 +16,7 @@ workspace;  % Make sure the workspace panel is showing.
 commandwindow();
 
 % set path of where data is located
-data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Data_Master\pecan_data_struct.mat'];
+data_path = fullfile(projectPath,'Pecan_Data_Master\pecan_data_struct.mat');
 
 load(data_path)
 
@@ -98,7 +97,7 @@ lb = [min(X1), min(Y1)];
 ub = [max(X1), max(Y1)];
 
 % home folder
-folder_loc = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Surface_Fits';
+folder_loc = fullfile(projectPath,'Pecan_Surface_Fits');
 
 % file name
 name = sprintf('PecanSurfaceFits-Angle.%d-Material.%s.mat',angleFix,materialFix);

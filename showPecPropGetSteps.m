@@ -9,8 +9,8 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-imExamplePath = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\'...
-    'Pecan_Data-20220526_145147\Pecan_Data-Image_Files\Post_Crack\20220516_142952.jpg'];
+imExamplePath = fullfile(projectPath,['Pecan_Data_Master\Pecan_Data-20220526_145147\'...
+    'Pecan_Data-Image_Files\Post_Crack\20220516_142952.jpg']);
 
 % read in image
 imExample = imread(imExamplePath);

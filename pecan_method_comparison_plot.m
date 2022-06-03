@@ -18,8 +18,7 @@ clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
 % load in method comparison data
-load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Calibration_Data\PMC_Data.mat'],'pecan_method_comp')
+load(fullfile(projectPath,'Pecan_Calibration_Data\PMC_Data.mat'),'pecan_method_comp')
 
 %% Plot
 

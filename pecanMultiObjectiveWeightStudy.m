@@ -89,7 +89,7 @@ textprogressbar('terminated');
 %% Closeout MATLAB
 
 % Data folder
-folder = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Surface_Fits';
+folder = fullfile(projectPath,'Pecan_Surface_Fits');
 
 % file name
 name = sprintf('pecanMultiObjectiveWeightStudy-Angle.%d-Material.%s.mat',fixAngle,fixMaterial);
