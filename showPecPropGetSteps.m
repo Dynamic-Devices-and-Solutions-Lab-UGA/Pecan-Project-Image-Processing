@@ -42,4 +42,3 @@ rect = [758.5 526.5 216 192];
 figure(1)
 imshow(imcrop(imStep1,rect))
 showMaskAsOverlay(0.2,imcrop(imStep7,rect),'r')
-
