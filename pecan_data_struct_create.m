@@ -23,10 +23,10 @@ commandwindow();
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master';
+data_path = fullfile(projectPath,'Pecan_Data_Master')';
 
 % load in info about valid files
-load('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\DataStatus','ver_summary_struct')
+load(fullfile(projectPath,'Pecan_Data_Master\DataStatus.mat'),'ver_summary_struct')
 
 %% load in info from ver_summary_struct
 

@@ -19,8 +19,8 @@ commandwindow();
 %% main
 
 % main data path
-dataPath = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\'...
-    'Pecan_Data-20220526_145147\Pecan_Data-Image_Files'];
+dataPath = fullfile(projectPath,...
+    'Pecan_Data_Master\Pecan_Data-20220526_145147\Pecan_Data-Image_Files');
 
 % possible states
 pecState = {'Pre_Crack','Post_Crack'};

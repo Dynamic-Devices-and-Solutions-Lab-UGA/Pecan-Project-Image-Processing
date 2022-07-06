@@ -5,7 +5,7 @@
 % before it is moved into the pecan data master folder
 %
 % First processing script
-% pecan_data_clean -> -> pecan_data_struct_create
+% pecan_data_clean -> pecan_data_struct_create
 %
 % Author: Dani Agramonte
 % Last Updated: 05.06.22
@@ -20,8 +20,7 @@ workspace;  % Make sure the workspace panel is showing.
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = ['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\'...
-    'Pecan_Data-20220526_145147'];
+data_path = fullfile(projectPath,'Pecan_Data_Master\Pecan_Data-20220526_145147');
 data_folder = 'Pecan_Data-20220526_145147';
 clear('textprogressbar'); % clear persistent vars in textprogressbar
 
@@ -624,7 +623,7 @@ textprogressbar('terminated');
 
 %% MATLAB Closeout Tasks
 
-save('C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Data_Master\DataStatus','ver_summary_struct');
+save(fullfile(projectPath,'Pecan_Data_Master\DataStatus.mat'),'ver_summary_struct');
 
 clearvars -except ver_summary_struct
 workspace;  % Make sure the workspace panel is showing.

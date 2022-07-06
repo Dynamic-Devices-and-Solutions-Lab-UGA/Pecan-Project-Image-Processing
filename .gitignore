@@ -15,9 +15,6 @@
 # OSX / *nix default autosave extension
 *.m~
 
-# .txt (yes this too)
-*.txt
-
 # Packaged app and toolbox files
 *.mlappinstall
 *.mltbx

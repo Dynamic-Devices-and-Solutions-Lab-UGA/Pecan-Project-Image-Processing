@@ -13,7 +13,7 @@ function [sol,solval] = pecanMultiobjectiveOptim(weight,x0,params)
 %% Initialize MATLAB
 
 % Data folder
-folder = 'C:\Users\Dani\Documents\Pecan-Project-Image-Processing\Pecan_Surface_Fits';
+folder = fullfile(projectPath,'Pecan_Surface_Fits');
 
 % file name
 name = sprintf('pecanSurfaceFits-Angle.%d-Material.%s.mat',params.Angle,params.Material);

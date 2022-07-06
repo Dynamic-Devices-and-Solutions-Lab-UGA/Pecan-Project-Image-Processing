@@ -16,9 +16,7 @@ clear; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
 
-load(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Calibration_Data\'...
-    'Pecan_Calibration_Data_Main.mat'])
+load(fullfile(projectPath,'Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat'))
 
 %% Fit data
 
@@ -66,7 +64,5 @@ set(gcf,'color','white')
 %% Shutdown tasks
 
 % save 
-save(['C:\Users\Dani\Documents\Pecan-Project-Image-Processing\'...
-    'Pecan_Calibration_Data\'...
-    'PHE_calibration_sfit.mat']);
+save(fullfile(projectPath,'Pecan_Calibration_Data\PHE_calibration_sfit.mat'));
 clear;

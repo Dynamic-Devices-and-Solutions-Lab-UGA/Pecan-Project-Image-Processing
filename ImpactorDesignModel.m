@@ -20,7 +20,7 @@ x = a*cos(t);
 y = b*sin(t);
 
 % slope for line
-m = 
+%m = 
 
 plot(x,y)
 yline(0.75)

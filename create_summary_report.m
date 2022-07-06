@@ -13,4 +13,4 @@
 runreport('contentsrpt')
 
 % create contents.m file in current directory
-makecontentsfile('C:\Users\Dani\Documents\Pecan-Project-Image-Processing','force')
+makecontentsfile(projectPath,'force')
