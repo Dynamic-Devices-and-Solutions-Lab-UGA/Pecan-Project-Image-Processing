@@ -36,7 +36,7 @@ pecanShellability = solval(:,:,2);
 % get optimal mass for each weight
 massOpt = sol(:,:,1);
 
-% get optimal heigh for each weight
+% get optimal height for each weight
 heightOpt = sol(:,:,2);
 
 set(groot,'defaultAxesTickLabelInterpreter','latex');  

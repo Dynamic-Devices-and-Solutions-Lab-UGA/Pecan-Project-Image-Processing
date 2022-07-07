@@ -12,4 +12,4 @@ function pathMain = projectPath()
 
 username = getenv('USERNAME');
 
-pathMain = fullfile('C:\Users',username,'Documents\Pecan-Project-Image-Processing');
+pathMain = fullfile('C:\Users',username,'OneDrive','Documents\Pecan-Project-Image-Processing');
