@@ -86,6 +86,6 @@ end
 
 if ~debugFlag
     % save 
-    save(fullfile(projectPath,'Pecan_Calibration_Data\PHE_calibration_sfit.mat'));
+    save(fullfile(projectPath,'\Calibration\Pecan_Calibration_Data\PHE_calibration_sfit.mat'));
     clear;
 end
