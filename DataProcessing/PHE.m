@@ -60,6 +60,8 @@ function [perc,query_pre_crack_length,query_pre_crack_width,pre_crack_bw,post_cr
     'Pecan Test Images/20220323_133327.jpg');
 
 
+% TODO: FIX OLD DEFS FOR PECAN PROPERTY GET
+
 % use absolute paths to get data
 [query_pre_crack_area,query_pre_crack_length,query_pre_crack_width,bounding_box_query,...
     bw_pre_crack_query,pre_crack_ecc,pre_crack_ext] = pecan_property_get(pre_crack_path);

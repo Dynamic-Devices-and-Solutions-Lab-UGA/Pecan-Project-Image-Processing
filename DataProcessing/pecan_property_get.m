@@ -103,6 +103,7 @@ bw = bwareafilt(imStep6,1);
 s = regionprops(bw,'ConvexArea','BoundingBox','Eccentricity','Extent');
 area = pecan_calibration(s(1).ConvexArea,'area');
 
+
 % find length and width of pecan
 dims = pecan_calibration(s(1).BoundingBox,'distance');
 
@@ -111,7 +112,6 @@ ext = s.Extent;
 
 % find eccentricity
 ecc = s.Eccentricity;
-
 
 % remove shift in box
 dims = dims(3:4);
