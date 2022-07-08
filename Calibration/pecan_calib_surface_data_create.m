@@ -24,7 +24,7 @@ debug = 'false'; % valid values are 'true' or 'false'
 %% Load in data and calculate dates in unix time
 
 % Get pre crack files
-pre_crack_files = dir(fullfile(projectPath,'Pecan_Calibration_Images','Pre_Crack','*.jpg'));
+pre_crack_files = dir(fullfile(projectPath,'Calibration','Pecan_Calibration_Images','Pre_Crack','*.jpg'));
 
 % number of pre crack pecans
 n_pecan_pre_crack = size(pre_crack_files,1);
@@ -38,7 +38,7 @@ for i = 1:n_pecan_pre_crack
 end
 
 % Get post crack files
-post_crack_files = dir(fullfile(projectPath,'Pecan_Calibration_Images','Post_Crack','*.jpg'));
+post_crack_files = dir(fullfile(projectPath,'Calibration','Pecan_Calibration_Images','Post_Crack','*.jpg'));
 
 % number of post crack files; equals number of calibration points
 n_pecan_post_crack = size(post_crack_files,1);
@@ -51,25 +51,14 @@ for i = 1:n_pecan_post_crack
     time_stamps_post_crack(i) = time_unix(post_crack_files(i).name);
 end
 
-% Get diseased files
-diseased_files = dir(fullfile(projectPath,'Pecan_Calibration_Images','Diseased','*.jpg'));
-
-% number of diseased files
-n_pecan_diseased = size(diseased_files,1);
-
-% initialize double array of diseased time stamps
-time_stamps_diseased = zeros(n_pecan_diseased,1);
-
-% get photo timestamps for diseased files
-for i = 1:n_pecan_diseased
-    time_stamps_diseased(i) = time_unix(diseased_files(i).name);
-end
 
 %% Order array
 
 % array of timestamps for all files
+% time_stamps_aggregate = [time_stamps_pre_crack;...
+%     time_stamps_post_crack;time_stamps_diseased];
 time_stamps_aggregate = [time_stamps_pre_crack;...
-    time_stamps_post_crack;time_stamps_diseased];
+    time_stamps_post_crack];
 
 % sorted time stamp array
 [time_stamps_aggregate_sort, I_sort] = sort(time_stamps_aggregate);
@@ -131,8 +120,8 @@ for i = 1:n_pecan_post_crack
             % updates all figures
             drawnow
 
-            % pause matlab for 2s
-            duration = 2;
+            % pause matlab for 0.5S
+            duration = 0.5;
             java.lang.Thread.sleep(duration*1000) 
 
             close all;
@@ -160,7 +149,7 @@ textprogressbar('terminated');
 %% Shutdown tasks
 
 % save data to .mat file
-save(fullfile(projectPath,'Pecan_Calibration_Data',...
+save(fullfile(projectPath,'Calibration','Pecan_Calibration_Data',...
     'Pecan_Calibration_Data_Main.mat'),'pecan_calibration_data');
 
 switch debug

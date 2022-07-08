@@ -20,13 +20,13 @@ workspace;  % Make sure the workspace panel is showing.
 %#ok<*UNRCH>
 
 % load data
-load(fullfile(projectPath,'Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat'))
+load(fullfile(projectPath,'Calibration\Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat'))
 
 % print figure
 printFlag = false;
 
 % debug flag
-debugFlag = true;
+debugFlag = false;
 
 %% Fit data
 
@@ -46,7 +46,7 @@ warning('off','curvefit:fit:iterationLimitReached')
 
 % Set up fittype and options.
 ft = fittype( 'poly11' );
-excludedPoints = excludedata(xData,yData,'Indices', [230 231] );
+excludedPoints = excludedata(xData,yData,'Indices', [46] );
 opts = fitoptions( 'Method', 'LinearLeastSquares' );
 opts.Robust = 'LAR';
 opts.Exclude = excludedPoints;

@@ -18,14 +18,10 @@ workspace;  % Make sure the workspace panel is showing.
 
 % pecan image processing folder - this is where all images are located pre
 % sort
-im_dir = fullfile(projectPath,...
-    'Pecan_Data_Master\Pecan_Data-20220526_145147\Pecan_Data-Image_Files');
+% im_dir = fullfile(projectPath,...
+%     'Pecan_Data_Master\Pecan_Data-20220526_145147\Pecan_Data-Image_Files');
 
-% set locations for destination
-prc_loc = fullfile(im_dir,'Pre_Crack');
-poc_loc = fullfile(im_dir,'Post_Crack');
-dd_loc = fullfile(im_dir,'Diseased');
-uc_loc = fullfile(im_dir,'Uncracked');
+im_dir = 'C:\Users\dnagr\OneDrive\Documents\Suspected Calibration Photos';
 
 % pre sort location files
 psl_files = dir(im_dir);
