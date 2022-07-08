@@ -8,6 +8,7 @@
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+pause(10)
 
 % add functionality for dealing with systems with OneDrive on it
 if isempty(getenv('OneDrive'))
