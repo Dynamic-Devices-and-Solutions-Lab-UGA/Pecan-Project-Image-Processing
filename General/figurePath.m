@@ -1,4 +1,4 @@
-function figurePath = figurePath()
+function figurePath = figurePath
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -6,10 +6,15 @@ function figurePath = figurePath()
 % Set path for figure output
 %
 % Author: Dani Agramonte
-% Last Updated: 07.07.22
+% Last Updated: 07.08.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-username = getenv('USERNAME');
+% add functionality for dealing with systems with OneDrive on it
+if isempty(genenv('OneDrive'))
+    DefaultLoc = [getenv('HOMEDRIVE'),getenv('HOMEPATH')];
+else
+    DefaultLoc = getenv('OneDrive');
+end
 
-figurePath = fullfile('C:\Users',username,'OneDrive','Documents\Pecan-Project-Image-Processing\Thesis_Plots');
+figurePath = fullfile(DefaultLoc,'Documents\Pecan-Project-Image-Processing\FigureGeneration\Thesis_Plots');

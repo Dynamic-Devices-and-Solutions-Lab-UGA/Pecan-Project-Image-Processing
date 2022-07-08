@@ -1,4 +1,4 @@
-function packageList = pecanProjectDependencies()
+function packageList = pecanProjectDependencies
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
 % 
@@ -9,9 +9,9 @@ function packageList = pecanProjectDependencies()
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%% main
+%% mains
 
-projectFiles =  dir(fullfile(projectPath,'*.m'));
+projectFiles =  dir(fullfile(projectPath,'**\*.m'));
 
 for i = numel(projectFiles):-1:1
     projectFilePaths(i) = {fullfile(projectFiles(i).folder,projectFiles(i).name)};
@@ -25,8 +25,8 @@ packageList = cell(numel(fList),1);
 
 for i = 1:numel(fList)
     fileparts = split(fList(i),'\');
-    if ~strcmp(fileparts(5),'Pecan-Project-Image-Processing')
-        packageList(i) = {fileparts(6)};
+    if ~strcmp(fileparts(6),'Pecan-Project-Image-Processing')
+        packageList(i) = {fileparts(7)};
     end
 end
 
