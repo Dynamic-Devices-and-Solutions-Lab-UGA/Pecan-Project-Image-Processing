@@ -53,16 +53,22 @@ function [perc,query_pre_crack_length,query_pre_crack_width,pre_crack_bw,post_cr
 [pre_crack_path,post_crack_path,params] = parseinputs(pre_crack_path,...
     post_crack_path,varargin{:});
 
-% Try to get pecan data from two image paths
+% get reference values for area, length, and width
+[ref_pre_crack_area,ref_pre_crack_length,ref_pre_crack_width,bounding_box_ref,bw_pre_crack_ref] = pecan_property_get(...
+    'Pecan Test Images/20220323_133233.jpg');
+[ref_post_crack_area,~,~,~,bw_post_crack_ref] = pecan_property_get(...
+    'Pecan Test Images/20220323_133327.jpg');
 
-% try to use absolute path
+
+% use absolute paths to get data
 [query_pre_crack_area,query_pre_crack_length,query_pre_crack_width,bounding_box_query,...
     bw_pre_crack_query,pre_crack_ecc,pre_crack_ext] = pecan_property_get(pre_crack_path);
+
 pre_crack_bw = bw_pre_crack_query;
 pre_crack_area = query_pre_crack_area;
 
-% try to use absolute path
 [query_post_crack_area,~,~,~,bw_post_crack_query,~,~]= pecan_property_get(post_crack_path);
+
 post_crack_bw = bw_post_crack_query;
 post_crack_area = query_post_crack_area;
 
@@ -85,6 +91,7 @@ switch params.method
         % call gamma 3
         perc = Gamma_3(pre_crack_ecc,pre_crack_ext,...
             query_pre_crack_area,query_post_crack_area);
+
 end
 
 if params.pre_cracked_bw
