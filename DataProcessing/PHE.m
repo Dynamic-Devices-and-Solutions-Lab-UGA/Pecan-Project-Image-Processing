@@ -67,7 +67,7 @@ function [perc,query_pre_crack_length,query_pre_crack_width,pre_crack_bw,post_cr
 pre_crack_bw = bw_pre_crack_query;
 pre_crack_area = query_pre_crack_area;
 
-[query_post_crack_area,~,~,~,bw_post_crack_query,~,~]= pecan_property_get(post_crack_path);
+[query_post_crack_area,ref_post_crack_length,ref_post_crack_width,~,bw_post_crack_query,~,~]= pecan_property_get(post_crack_path);
 
 post_crack_bw = bw_post_crack_query;
 post_crack_area = query_post_crack_area;

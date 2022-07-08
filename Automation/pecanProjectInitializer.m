@@ -4,13 +4,13 @@
 % initializes project folder
 %
 % Author: Dani Agramonte
-% Last Updated: 06.03.22
+% Last Updated: 06.03.22s
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % add functionality for dealing with systems with OneDrive on it
-if isempty(genenv('OneDrive'))
+if isempty(getenv('OneDrive'))
     DefaultLoc = [getenv('HOMEDRIVE'),getenv('HOMEPATH')];
 else
     DefaultLoc = getenv('OneDrive');

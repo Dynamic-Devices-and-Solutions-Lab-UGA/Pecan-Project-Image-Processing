@@ -19,5 +19,5 @@ if strcmp(status,'start')
         parpool;
     end
 elseif strcmp(status,'end')
-    delete(poolobj);
+    delete(p);
 end

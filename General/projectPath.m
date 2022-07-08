@@ -11,7 +11,7 @@ function pathMain = projectPath()
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % add functionality for dealing with systems with OneDrive on it
-if isempty(genenv('OneDrive'))
+if isempty(getenv('OneDrive'))
     DefaultLoc = [getenv('HOMEDRIVE'),getenv('HOMEPATH')];
 else
     DefaultLoc = getenv('OneDrive');
