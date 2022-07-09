@@ -53,14 +53,15 @@ function [perc,query_pre_crack_length,query_pre_crack_width,pre_crack_bw,post_cr
 [pre_crack_path,post_crack_path,params] = parseinputs(pre_crack_path,...
     post_crack_path,varargin{:});
 
+% pre_crack_ref_path = fullfile(projectPath,'Calibration/Pecan_Test_Images/20220323_133233.jpg');
+% post_crack_ref_path = fullfile(projectPath,'Calibration/Pecan_Test_Images/20220323_133327.jpg');
+
+pre_crack_ref_path = fullfile(projectPath,'Calibration/Pecan_Calibration_Images/Pre_Crack/20220427_161730.jpg');
+post_crack_ref_path = fullfile(projectPath,'Calibration/Pecan_Calibration_Images/Post_Crack/20220427_161811.jpg');
+
 % get reference values for area, length, and width
-[ref_pre_crack_area,ref_pre_crack_length,ref_pre_crack_width,bounding_box_ref,bw_pre_crack_ref] = pecan_property_get(...
-    'Pecan Test Images/20220323_133233.jpg');
-[ref_post_crack_area,~,~,~,bw_post_crack_ref] = pecan_property_get(...
-    'Pecan Test Images/20220323_133327.jpg');
-
-
-% TODO: FIX OLD DEFS FOR PECAN PROPERTY GET
+[ref_pre_crack_area,ref_pre_crack_length,ref_pre_crack_width,bounding_box_ref,bw_pre_crack_ref] = pecan_property_get(pre_crack_ref_path);
+[ref_post_crack_area,ref_post_crack_length,ref_post_crack_width,~,bw_post_crack_ref] = pecan_property_get(post_crack_ref_path);
 
 % use absolute paths to get data
 [query_pre_crack_area,query_pre_crack_length,query_pre_crack_width,bounding_box_query,...
@@ -69,7 +70,7 @@ function [perc,query_pre_crack_length,query_pre_crack_width,pre_crack_bw,post_cr
 pre_crack_bw = bw_pre_crack_query;
 pre_crack_area = query_pre_crack_area;
 
-[query_post_crack_area,ref_post_crack_length,ref_post_crack_width,~,bw_post_crack_query,~,~]= pecan_property_get(post_crack_path);
+[query_post_crack_area,~,~,~,bw_post_crack_query,~,~]= pecan_property_get(post_crack_path);
 
 post_crack_bw = bw_post_crack_query;
 post_crack_area = query_post_crack_area;
@@ -112,6 +113,11 @@ if params.post_cracked_bw
     figure
     imshow(bw_post_crack_query)
     showMaskAsOverlay(0.5,bw_post_crack_ref,'r')
+    if params.bounding_box
+        hold on
+        rectangle('Position',bounding_box_ref,'EdgeColor','b')
+        rectangle('Position',bounding_box_query,'EdgeColor','b')
+    end
 end
 
 %-----------END MAIN FUNCTION-----------%
@@ -242,7 +248,7 @@ end
 function perc = Gamma_3(pre_crack_ecc,pre_crack_ext,query_pre_crack_area,query_post_crack_area)
 
 % load in calibrated surface fit
-load(fullfile(projectPath,'Pecan_Calibration_Data\PHE_calibration_sfit.mat'),'calib_surf');
+load(fullfile(projectPath,'Calibration\Pecan_Calibration_Data\PHE_calibration_sfit.mat'),'calib_surf');
 
 % predicted ideal area of pecan half
 pcAreaEstIdeal = calib_surf(pre_crack_ecc,pre_crack_ext)*query_pre_crack_area;
