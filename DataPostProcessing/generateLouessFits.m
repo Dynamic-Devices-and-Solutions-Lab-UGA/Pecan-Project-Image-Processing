@@ -149,6 +149,8 @@ if param.coordSys
     [var1,var2] = coordTrans(var1,var2);
     % var1 = V
     % var2 = E
+else
+    [var1,var2] = coordTrans2(var1,var2);
 end
 
 % find weights by taking into consideration number of tests
@@ -186,7 +188,7 @@ if ~param.coordSys
     opts.Robust = 'Bisquare';
     opts.Span = 0.75;
 else
-    opts.Span = 0.3;
+    opts.Span = 0.75;
 end
 opts.Weights = weights;
 
@@ -202,4 +204,10 @@ g = 9.8;
 V = (2*g*(H/100)).^0.5;
 E = g*(M/1000).*(H/100);
 
+end
+
+function [H,M] = coordTrans2(H,M)
+% shift M and H to m and kg
+M = M/1000;
+H = H/100;
 end
