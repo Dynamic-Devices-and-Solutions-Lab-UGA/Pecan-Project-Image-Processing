@@ -16,24 +16,39 @@ workspace;  % Make sure the workspace panel is showing.
 commandwindow();
 
 % set path of where data is located
-data_path = fullfile(projectPath,'Pecan_Data_Master\pecan_data_struct.mat');
+data_path = fullfile(projectPath,'DataProcessing\Pecan_Data_Master\pecan_data_struct.mat');
 
 load(data_path)
 
-%% plot data
+%% Generate sfits
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                            Angle - 15, Material - Steel                                         %
-%                                                                                                 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% angles of consideration
+angleFix = [15,30,45];
+materialFix = {'Steel','DurableResin'};
 
-angleFix = 30;
-materialFix = 'Steel';
+% combinations
+% [angleFix, materialFix]
+combs = [...
+    1 1;...
+    2 1;...
+    3 1;...
+    2 2];
 
-% get fits
-[var_out1,PecanMeatIntegrity_sfit,g1] = getHSlice(angleFix,materialFix,pecan_data_struct,'P');
-[var_out2,PecanShellability_sfit,g2] = getHSlice(angleFix,materialFix,pecan_data_struct,'S');
+for i = 1:size(combs,1)
+    % get fits
+    [var_outIntegrity,PecanMeatIntegrity_sfit,gIntegrity] = getHSlice(angleFix(combs(i,1)),materialFix{combs(i,2)},pecan_data_struct,'P');
+    [var_outShellability,PecanShellability_sfit,gShellability] = getHSlice(angleFix(combs(i,1)),materialFix{combs(i,2)},pecan_data_struct,'S');
 
+    % generate names
+    namePMI = fullfile(projectPath,'DataPostProcessing','LowessFits',sprintf('PecanMeatIntegrityFit_%.f_%s.mat',angleFix(combs(i,1)),materialFix{combs(i,2)}));
+    nameShell = fullfile(projectPath,'DataPostProcessing','LowessFits',sprintf('ShellabilityFit_%.f_%s.mat',angleFix(combs(i,1)),materialFix{combs(i,2)}));
+
+    % save variables
+    save(namePMI,'var_outIntegrity','PecanMeatIntegrity_sfit','gIntegrity')
+    save(nameShell,'var_outShellability','PecanShellability_sfit','gShellability')
+end
+
+%{
 % data for opts = 'P'
 X1 = var_out1(:,1);
 Y1 = var_out1(:,2);
@@ -64,7 +79,7 @@ ylabel('Height [m]');
 zlabel('Pecan Integrity, $\Psi [\%]$');
 
 % specify title
-paramTitle = sprintf('Sampling of $V$-$E$ Parameter space: Material = %s,  $\\phi$  = %2d$^{\\circ}$',materialFix,angleFix);
+% paramTitle = sprintf('Sampling of $V$-$E$ Parameter space: Material = %s,  $\\phi$  = %2d$^{\\circ}$',materialFix,angleFix);
 title(paramTitle)
 
 % turn grid on
@@ -100,10 +115,13 @@ ub = [max(X1), max(Y1)];
 folder_loc = fullfile(projectPath,'Pecan_Surface_Fits');
 
 % file name
-name = sprintf('PecanSurfaceFits-Angle.%d-Material.%s.mat',angleFix,materialFix);
+% name = sprintf('PecanSurfaceFits-Angle.%d-Material.%s.mat',angleFix,materialFix);
 
 % save data
-save(fullfile(folder_loc,name),'PecanMeatIntegrity_sfit','PecanShellability_sfit','lb','ub')
+% save(fullfile(folder_loc,name),'PecanMeatIntegrity_sfit','PecanShellability_sfit','lb','ub')
+%}
+
+clear;
 
 
 

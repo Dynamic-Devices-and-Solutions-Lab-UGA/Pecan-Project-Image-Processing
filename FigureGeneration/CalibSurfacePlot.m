@@ -17,15 +17,15 @@ workspace;  % Make sure the workspace panel is showing.
 %#ok<*UNRCH>
 
 % load data
-load(fullfile(projectPath,'Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat'));
+load(fullfile(projectPath,'Calibration\Pecan_Calibration_Data\Pecan_Calibration_Data_Main.mat'));
 
 % load fit
-load(fullfile(projectPath,'Pecan_Calibration_Data\PHE_calibration_sfit.mat'));
+load(fullfile(projectPath,'Calibration\Pecan_Calibration_Data\PHE_calibration_sfit.mat'));
 
 %% File variables
 
 % print figure
-printFlag = false;
+printFlag = true;
 
 %% Experimental Points
 
@@ -37,7 +37,7 @@ printFlag = false;
     pecan_calibration_data(:,1));
 
 % define excludedPoints
-excludedPoints = excludedata(xData,yData,'Indices', [230 231] );
+excludedPoints = excludedata(xData,yData,'indices', 46 );
 
 % redefine data vectors
 xData = xData(~excludedPoints);
@@ -86,7 +86,7 @@ fig = figure;
 ax = axes('Parent',fig);
 
 % plot calib surf fit
-s = surf(Xgrid,Ygrid,Zvals);
+s = surf(Xgrid,Ygrid,Zvals,'FaceColor','interp','FaceLighting','gouraud');
 
 % turn off edges
 s.EdgeColor = 'none';
