@@ -11,117 +11,211 @@
 %% Initialize MATLAB
 
 % clear variables; % Clear variables
+
+clear; % Clear variables
+clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.
-commandwindow();
+
+% remove warning which is given if a statement is unreachable
+%#ok<*UNRCH>
 
 % Data folder
-folder = fullfile(projectPath,'Pecan_Surface_Fits');
+dataFolder = fullfile(projectPath,'DataPostProcessing','ParetoOptimization');
 
-% file name
-name = 'pecanMultiObjectiveWeightStudy-Angle.30-Material.Steel.mat';
+%% File variables
 
-% set path of where data is located
-data_path = fullfile(folder,name);
+% print figure
+printFlag = true;
 
-load(data_path,'sol','solval');
+% choose which file to plot
+ind = 8;
 
-%% Main script
+%% Load in data
 
-% get pecan integrity metric
-pecanIntegrity = solval(:,:,1);
+% get all files
+files = dir(fullfile(dataFolder,'*.mat'));
 
-% get shellability metric
-pecanShellability = solval(:,:,2);
+% load in data - start with the first one
+load(fullfile(files(1).folder,files(ind).name));
 
-% get optimal mass for each weight
-massOpt = sol(:,:,1);
+%% view angle
 
-% get optimal height for each weight
-heightOpt = sol(:,:,2);
+% generated manually
+viewAngles = [-102.981594382658 20.2320767990045 58.5091442114029 28.9895253657519;...
+              -124.198241513636 19.89525308087 73.1623681292005 25.284451696994;...
+              -131.066940225103 19.558428718003 79.7257913423806 33.0314237555744;...
+              -120.68757328333 24.9476268950347 67.9726846583138 30.3368248686648;...
+              -112.750410327856 25.6212777690622 68.7358734040325 29.6631751203401;...
+              -124.045603764492 18.5479514843068 75.7572098646438 30.6736497399354;...
+              -133.509144211403 19.2216034854634 59.8828839536964 31.0104746303976;...
+              -110.613481839844 15.516530304694 76.9783118577936 30.6736497465445];
 
+%% Labels
+
+zlabels = {'$\Psi(M^{\star},H^{\star}) [\%]$','$\Psi(M^{\star},H^{\star}) [\%]$','$\Psi(M^{\star},H^{\star}) [\%]$','$\Psi(M^{\star},H^{\star}) [\%]$',...
+           '$\Psi(V^{\star},E^{\star}) [\%]$','$\Psi(V^{\star},E^{\star}) [\%]$','$\Psi(V^{\star},E^{\star}) [\%]$','$\Psi(V^{\star},E^{\star}) [\%]$';...
+            '$\Xi(M^{\star},H^{\star}) [\%]$','$\Xi(M^{\star},H^{\star}) [\%]$','$\Xi(M^{\star},H^{\star}) [\%]$','$\Xi(M^{\star},H^{\star}) [\%]$',...
+           '$\Xi(V^{\star},E^{\star}) [\%]$','$\Xi(V^{\star},E^{\star}) [\%]$','$\Xi(V^{\star},E^{\star}) [\%]$','$\Xi(V^{\star},E^{\star}) [\%]$'};
+
+titles = {'$M-H$ Domain Pareto Front: $\phi = 15^{\circ}$, Material = Steel',...
+            '$M-H$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Durable Resin',...
+            '$M-H$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Steel',...
+            '$M-H$ Domain Pareto Front: $\phi = 45^{\circ}$, Material = Steel',...
+            '$V-E$ Domain Pareto Front: $\phi = 15^{\circ}$, Material = Steel',...
+            '$V-E$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Durable Resin',...
+            '$V-E$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Steel',...
+            '$V-E$ Domain Pareto Front: $\phi = 45^{\circ}$, Material = Steel';...
+            '$M-H$ Domain Pareto Front: $\phi = 15^{\circ}$, Material = Steel',...
+            '$M-H$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Durable Resin',...
+            '$M-H$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Steel',...
+            '$M-H$ Domain Pareto Front: $\phi = 45^{\circ}$, Material = Steel',...
+            '$V-E$ Domain Pareto Front: $\phi = 15^{\circ}$, Material = Steel',...
+            '$V-E$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Durable Resin',...
+            '$V-E$ Domain Pareto Front: $\phi = 30^{\circ}$, Material = Steel',...
+            '$V-E$ Domain Pareto Front: $\phi = 45^{\circ}$, Material = Steel'};
+
+outfiles = {'MHIntegrityPareto_Phi15_MaterialSteel.pdf',...
+            'MHIntegrityPareto_Phi30_MaterialDurableResin.pdf',...
+            'MHIntegrityPareto_Phi30_MaterialSteel.pdf',...
+            'MHIntegrityPareto_Phi45_MaterialSteel.pdf',...
+            'VEShellabilityPareto_Phi15_MaterialSteel.pdf',...
+            'VEShellabilityPareto_Phi30_MaterialDurableResin.pdf',...
+            'VEShellabilityPareto_Phi30_MaterialSteel.pdf',...
+            'VEShellabilityPareto_Phi45_MaterialSteel.pdf';...
+            'MHIntegrityPareto_Phi15_MaterialSteel.pdf',...
+            'MHIntegrityPareto_Phi30_MaterialDurableResin.pdf',...
+            'MHIntegrityPareto_Phi30_MaterialSteel.pdf',...
+            'MHIntegrityPareto_Phi45_MaterialSteel.pdf',...
+            'VEShellabilityPareto_Phi15_MaterialSteel.pdf',...
+            'VEShellabilityPareto_Phi30_MaterialDurableResin.pdf',...
+            'VEShellabilityPareto_Phi30_MaterialSteel.pdf',...
+            'VEShellabilityPareto_Phi45_MaterialSteel.pdf'};
+
+xlabels = {'$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$';...
+    '$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$','$W_{(\Psi)}$'};
+ylabels = {'$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$';...
+    '$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$','$W_{(\Xi)}$'};
+
+%% Plot
+
+%%%%%%%%%%%%%%%%%%%
+% plot initialization
+%
+% set font size
+fontsize = 26;
+
+% set default interpreter
 set(groot,'defaultAxesTickLabelInterpreter','latex');  
 set(groot,'defaulttextinterpreter','latex');
 set(groot,'defaultLegendInterpreter','latex');
+%%%%%%%%%%%%%%%%%%%
 
-fontsize = 22;
+%% Plot integrity
 
+% create figure object
+fig1 = figure;
 
+% Create axes object
+ax1 = axes('Parent',fig1);
 
-figure(1)
-[X1,X2] = meshgrid(w1,w2);
-surf(X1,X2,pecanShellability,pecanIntegrity)
-xlabel('Pecan Integrity Weight, $w_{\Psi}$ ','FontSize',fontsize)
-ylabel('Pecan Shellability Weight, $w_{\Xi}$ ','FontSize',fontsize)
-zlabel('Pecan Shellability, $\Xi [\%]$')
-colormap(jet)
-c = colorbar;
-c.Label.String = 'Pecan Integrity, $\Psi [\%]$';
-c.Label.Interpreter = 'latex';
-%c.Label.Position(1) = 3;
-ax = gca;
-ax.FontSize = fontsize; 
+% plot pecan integrity metric
+s = surf(W1,W2,solval(:,:,1),'FaceColor','interp','FaceLighting','gouraud');
+
+% turn off edges
+s.EdgeColor = 'none';
+
+% use Cynthia Brewer's research to make a colormap for the surface fit
+colormap(linspecer);
+
+% set axis fontsize
+set(ax1,'FontSize',fontsize);
+
+% set viewing angle
+view(ax1,viewAngles(ind,1:2));
+
+% define position vector
+Position = [300, 150, 1100, 750];
+
+% set size
+set(fig1, 'Position',  Position)
+
+% axis labels
+xlabel(xlabels{1,ind},'FontSize',fontsize)
+ylabel(ylabels{1,ind},'FontSize',fontsize)
+zlabel(zlabels{1,ind},'FontSize',fontsize)
+
+% set lims
+xlim([min(W1(:)) max(W1(:))])
+ylim([min(W2(:)) max(W2(:))])
+zlim([0.98*min(min(solval(:,:,1))) max(max(solval(:,:,1)))/0.98])
+
+% rescale colormap based off of zlims
+caxis(gca,[min(min(solval(:,:,1))) max(max(solval(:,:,1)))]);
+
+% title
+title(titles{1,ind},'FontSize',fontsize)
+
+% set background to white
 set(gcf,'color','white')
-title('Pareto optimal surface in domain when Angle=30 and Material=Steel','FontSize',fontsize)
-view(ax,[71.4732087227414 25.3512393887946]);
-grid(ax,'on');
-hold(ax,'off');
-set(gcf,'Position',[241 201 1452 755])
 
-%{
-figure(2)
-[X1,X2] = meshgrid(w1,w2);
-surf(X1,X2,pecanIntegrity,pecanShellability)
-xlabel('Pecan Integrity Weight, $w_{\Psi}$ ','FontSize',fontsize)
-ylabel('Pecan Shellability Weight, $w_{\Xi}$ ','FontSize',fontsize)
-zlabel('Pecan Integrity, $\Psi$ [\%] ','FontSize',fontsize)
-title('Pareto optimal surface in domain when Angle=30 and Material=Steel','FontSize',fontsize)
-colormap(jet)
-c = colorbar;
-c.Label.String = 'Pecan Shellability, $\Xi$';
-c.Label.Interpreter = 'latex';
-ax = gca;
-ax.FontSize = fontsize; 
+%% Plot shellability
+
+% create figure object
+fig2 = figure;
+
+% Create axes object
+ax2 = axes('Parent',fig2);
+
+% plot shellability metric
+s = surf(W1,W2,solval(:,:,2),'FaceColor','interp','FaceLighting','gouraud');
+
+% turn off edges
+s.EdgeColor = 'none';
+
+% use Cynthia Brewer's research to make a colormap for the surface fit
+colormap(linspecer);
+
+% set axis fontsize
+set(ax2,'FontSize',fontsize);
+
+% set viewing angle
+view(ax2,viewAngles(ind,3:4));
+
+% define position vector
+Position = [300, 150, 1100, 750];
+
+% set size
+set(fig2, 'Position',  Position)
+
+% axis labels
+xlabel(xlabels{2,ind},'FontSize',fontsize)
+ylabel(ylabels{2,ind},'FontSize',fontsize)
+zlabel(zlabels{2,ind},'FontSize',fontsize)
+
+% set lims
+xlim([min(W1(:)) max(W1(:))])
+ylim([min(W2(:)) max(W2(:))])
+zlim([0.98*min(min(solval(:,:,2))) max(max(solval(:,:,2)))/0.98])
+
+% rescale colormap based off of zlims
+caxis(gca,[min(min(solval(:,:,2))) max(max(solval(:,:,2)))]);
+
+% title
+title(titles{2,ind},'FontSize',fontsize)
+
+% set background to white
 set(gcf,'color','white')
-view(ax,[71.4732087227414 25.3512393887946]);
-grid(ax,'on');
-hold(ax,'off');
-set(gcf,'Position',[241 201 1452 755])
-view(ax,[-115.9163 36.7847])
 
-figure(3)
-surf(X1,X2,massOpt,heightOpt)
-xlabel('Pecan Integrity Weight, $w_{\Psi}$ ','FontSize',fontsize)
-ylabel('Pecan Shellability Weight, $w_{\Xi}$ ','FontSize',fontsize)
-zlabel('Optimal Mass [g]','FontSize',fontsize)
-colormap(jet)
-c = colorbar;
-c.Label.String = 'Optimal Height [cm]';
-c.Label.Interpreter = 'latex';
-ax = gca;
-ax.FontSize = fontsize; 
-set(gcf,'color','white')
-view(ax,[71.4732087227414 25.3512393887946]);
-grid(ax,'on');
-hold(ax,'off');
-title('Pareto optimal surface in codomain when Angle=30 and Material=Steel','FontSize',fontsize)
-set(gcf,'Position',[241 201 1452 755])
+%% print
 
+if printFlag
+    export_fig(fig1,fullfile(figurePath,outfiles{1,ind}))
+    export_fig(fig2,fullfile(figurePath,outfiles{2,ind}))
+    close all;
+end
 
-figure(4)
-surf(X1,X2,heightOpt,massOpt)
-xlabel('Pecan Integrity Weight, $w_{\Psi}$ ','FontSize',fontsize)
-ylabel('Pecan Shellability Weight, $w_{\Xi}$ ','FontSize',fontsize)
-zlabel('Optimal Height [h]','FontSize',fontsize)
-colormap(jet)
-c = colorbar;
-c.Label.String = 'Optimal Mass [g]';
-c.Label.Interpreter = 'latex';
-ax = gca;
-ax.FontSize = fontsize; 
-set(gcf,'color','white')
-view(ax,[71.4732087227414 25.3512393887946]);
-grid(ax,'on');
-hold(ax,'off');
-title('Pareto optimal surface in codomain when Angle=30 and Material=Steel','FontSize',fontsize)
-set(gcf,'Position',[241 201 1452 755])
-%}
+% %% Closeout
+% 
+% clear; % Clear variables
+% clc;  % Clear command window.
+% workspace;  % Make sure the workspace panel is showing
