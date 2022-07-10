@@ -1,4 +1,4 @@
-function [sol,solval] = pecanMultiobjectiveOptim(weight,x0,params)
+function [sol,solval] = pecanMultiobjectiveOptim(weight,x0,pmi_path,ps_path)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DDSL - Pecan Project
@@ -6,22 +6,27 @@ function [sol,solval] = pecanMultiobjectiveOptim(weight,x0,params)
 % Uses MATLAB's built in multiobjective optimization tools to obtain Pareto optima from pecan fits
 %
 % Author: Dani Agramonte
-% Last Updated: 05.30.22
+% Last Updated: 07.09.22
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% Initialize MATLAB
 
-% Data folder
-folder = fullfile(projectPath,'Pecan_Surface_Fits');
+% load integrity data
+load(pmi_path,'PecanMeatIntegrity_sfit','var_outIntegrity');
 
-% file name
-name = sprintf('pecanSurfaceFits-Angle.%d-Material.%s.mat',params.Angle,params.Material);
+% load shellability data
+load(ps_path,'PecanShellability_sfit');
 
-% set path of where data is located
-data_path = fullfile(folder,name);
+% get parameter space - note that this should be the same for shellability
+% and integrity
+X1 = var_outIntegrity(:,1);
+Y1 = var_outIntegrity(:,2);
 
-load(data_path,'PecanMeatIntegrity_sfit','PecanShellability_sfit','lb','ub');
+% calculate upper and lower bounds
+lb = [min(X1), min(Y1)];
+ub = [max(X1), max(Y1)];
+
 
 %% Main Function
 

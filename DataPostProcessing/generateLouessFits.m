@@ -42,7 +42,6 @@ opts1.coordSys = coordSys;
 opts2.type = 'S';
 opts2.coordSys = coordSys;
 
-
 for i = 1:size(combs,1)
     % get fits
     [var_outIntegrity,PecanMeatIntegrity_sfit,gIntegrity] = getHSlice(angleFix(combs(i,1)),materialFix{combs(i,2)},pecan_data_struct,opts1);
