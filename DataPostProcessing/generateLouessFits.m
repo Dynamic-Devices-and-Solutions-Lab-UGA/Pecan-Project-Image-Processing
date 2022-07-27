@@ -56,6 +56,8 @@ for i = 1:size(combs,1)
     save(nameShell,'var_outShellability','PecanShellability_sfit','gShellability')
 end
 
+keyboard
+
 clear;
 
 %---- END MAIN SCRIPT ----%

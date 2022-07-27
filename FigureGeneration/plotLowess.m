@@ -28,7 +28,7 @@ dataFolder = fullfile(projectPath,'DataPostProcessing','LowessFits');
 printFlag = true;
 
 % choose which file to plot 1-4: integrity, 5-8: shellability
-ind = 8;
+ind = 1;
 
 %% Load in data
 
@@ -197,7 +197,12 @@ set(fig, 'Position',  Position)
 % axis labels
 xlabel(xlabels{ind},'FontSize',fontsize)
 ylabel(ylabels{ind},'FontSize',fontsize)
-zlabel(zlabels{ind},'FontSize',fontsize)
+zlabel = zlabel(zlabels{ind},'FontSize',fontsize,'rotation',0);
+
+zlabel.Position(2) = zlabel.Position(2)+0.6;
+zlabel.Position(1) = zlabel.Position(1)+0.2;
+
+ax.OuterPosition = [0.2 0.2 0.8 0.8];
 
 % set lims
 xlim([min(Xgrid(:)) max(Xgrid(:))])
@@ -208,7 +213,7 @@ zlim([0 110])
 caxis(gca,[0 110]);
 
 % title
-title(titles{ind},'FontSize',fontsize)
+% title(titles{ind},'FontSize',fontsize)
 
 % set background to white
 set(gcf,'color','white')

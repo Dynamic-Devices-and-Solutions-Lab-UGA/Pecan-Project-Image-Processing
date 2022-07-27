@@ -16,14 +16,16 @@ workspace;  % Make sure the workspace panel is showing.
 commandwindow();
 
 % set path of where data is located
-data_path = fullfile(projectPath,'Pecan_Data_Master\pecan_data_struct.mat');
+data_path = fullfile(projectPath,'DataProcessing\Pecan_Data_Master\pecan_data_struct.mat');
+
+%#ok<*SAGROW> 
 
 load(data_path)
 
 %% plot data
 
-angleFix = 45;
-materialFix = 'Steel';
+angleFix = 30;
+materialFix = 'DurableResin';
 
 M = zeros(5e4,1);
 H = zeros(5e4,1);
@@ -82,8 +84,10 @@ for i = 1:n_M
 end
 
 % get change in Vgrid and Egrid along a single axis
-dM = (MgridcoordsSort(2)-MgridcoordsSort(1));
-dH = (HgridcoordsSort(2)-HgridcoordsSort(1));
+dM = abs(diff(MgridcoordsSort));
+dM(end+1) = dM(end);
+dH = abs(diff(HgridcoordsSort));
+dH(end+1) = dH(end);
 
 % make meshgrid of original coordinate space
 [Mgrid, Hgrid] = meshgrid(MgridcoordsSort,HgridcoordsSort);
@@ -92,18 +96,23 @@ dH = (HgridcoordsSort(2)-HgridcoordsSort(1));
 g = 9.8;
 
 % shift grid by a half unit
-Mgridtrans = Mgrid-dM/2;
-Hgridtrans = Hgrid-dH/2;
+Mgridtrans = Mgrid-(dM'/2).*ones(size(Mgrid));
+Hgridtrans = Hgrid-(dH/2).*ones(size(Hgrid));
 
 % add new row and column to Vgrid and Egrid
-Mgridtrans(:,end+1) = dM+Mgridtrans(:,end);
+Mgridtrans(:,end+1) = dM(end)+Mgridtrans(:,end);
 Mgridtrans(end+1,:) = Mgridtrans(end,:);
-Hgridtrans(end+1,:) = dH+Hgridtrans(end,:);
+Hgridtrans(end+1,:) = dH(end)+Hgridtrans(end,:);
 Hgridtrans(:,end+1) = Hgridtrans(:,end);
 
 % convert grid from m-h domain to v-e domain
 Vgrid = ((2*g*Hgridtrans).^0.5)/(100);
 Egrid = (Mgridtrans.*g.*Hgridtrans)/(100*1000);
+
+if angleFix == 45
+    %Vgrid(4,:) = (0.75*Vgrid(4,:)+0.25*Vgrid(5,:));
+    %Egrid(4,:) = (0.75*Egrid(4,:)+0.25*Egrid(5,:));
+end
 
 % convert tick marks from m-h domain to v-e domains
 VgridTicks = ((2*g*HgridcoordsSort).^0.5)/(100);
@@ -113,6 +122,32 @@ VgridTicks = ((2*g*HgridcoordsSort).^0.5)/(100);
 parameterSpace_VE = rot90(parameterSpace_MH,-1);
 parameterSpace_VE(end+1,:) = parameterSpace_VE(end,:);
 parameterSpace_VE(:,end+1) = parameterSpace_VE(:,end);
+
+for i = 1:14
+    for j = 1:5
+        xpatchLocal = Vgrid(((i-1)+1):((i-1)+2),((j-1)+1):((j-1)+2))';
+        Xpatch{i,j} = xpatchLocal(:);
+    end
+end
+Xpatch = Xpatch(:);
+for i = 1:14
+    for j = 1:5
+        ypatchLocal = Egrid(((i-1)+1):((i-1)+2),((j-1)+1):((j-1)+2))';
+        ypatchLocal = ypatchLocal(:);
+        Ypatch{i,j} = ypatchLocal([1;2;4;3]);
+    end
+end
+Ypatch = Ypatch(:);
+
+parameterSpace_VE = parameterSpace_VE(1:14,1:5);
+parameterSpace_VE = parameterSpace_VE(:);
+for i = 1:70
+    if parameterSpace_VE(i) == 1
+        test(i) = {'white'};
+    else
+        test(i) = {'black'};
+    end
+end
 
 % figure of sampled coordinates in m-h space
 h1 = figure;
@@ -133,13 +168,14 @@ paramTitle = sprintf('Sampling of $M$-$H$ Parameter space: Material = %s,  $\\ph
 title(paramTitle)
 set(gcf,'color','white')
 % store file with export_fig
-store_loc = fullfile(projectPath,'Figures');
-filename = sprintf('Sample-ParameterSpace.MH-Material.%s-Angle.%d.eps',materialFix,angleFix);
+store_loc = fullfile(projectPath,'FigureGeneration\Thesis_Plots');
+filename = sprintf('Sample-ParameterSpace.MH-Material.%s-Angle.%d.pdf',materialFix,angleFix);
 export_fig(h1,fullfile(store_loc,filename));
 
 % figure of sampled coordinates in v-e space
 h2 = figure;
 
+%{
 surf(Vgrid,Egrid,parameterSpace_VE)
 colormap gray
 xticks(VgridTicks)
@@ -153,10 +189,43 @@ ylabel('Energy [J]')
 view(gca,[0 90]);
 grid off
 box on
+%}
+
+set(groot,'defaultAxesTickLabelInterpreter','latex');
+set(groot,'defaulttextinterpreter','latex');
+set(groot,'defaultLegendInterpreter','latex');
+patch([0.15 0.7 0.7 0.15],[0.15 0.15 19 19],'black')
+hold on
+cellfun(@patch,Xpatch,Ypatch,test',repmat({'LineStyle'},70,1),repmat({'none'},70,1))
+% cellfun(@patch,Xpatch,Ypatch,test')
+xticks(VgridTicks)
+if strcmp(materialFix,'Steel')&&angleFix==15
+    xticks(VgridTicks(1:10))
+end
+yticks(2:2:19)
+set(gca,'TickDir','out')
+% xline(VgridTicks,'--k')
+xlim([0.15 0.7])
+ylim([0.15 19])
+if strcmp(materialFix,'Steel')&&angleFix==45
+    set(gcf,'Position',[200 75 1400 900])
+elseif strcmp(materialFix,'Steel')&&angleFix==30
+    set(gcf,'Position',[200 75 1400 900])
+elseif strcmp(materialFix,'Steel')&&angleFix==15
+    set(gcf,'Position',[200 75 1400 900])
+elseif strcmp(materialFix,'DurableResin')&&angleFix==30
+    set(gcf,'Position',[200 75 1400 900])
+end
+xlabel('Velocity [m/s]','FontSize',26)
+ylabel('Energy [J]','FontSize',26)
+set(gcf,'color','white')
+ax = gca;
+ax.FontSize = 26;
+
 % store file with export_fig
-store_loc = fullfile(projectPath,'Figures');
-filename = sprintf('Sample-ParameterSpace.VE-Material.%s-Angle.%d.eps',materialFix,angleFix);
-export_fig(h2,fullfile(store_loc,filename));
+store_loc = fullfile(projectPath,'FigureGeneration\Thesis_Plots');
+filename = sprintf('Sample-ParameterSpace.VE-Material.%s-Angle.%d.pdf',materialFix,angleFix);
+export_fig(gcf,fullfile(store_loc,filename));
 
 
 %% Closeout MATLAB

@@ -37,7 +37,7 @@ printFlag = true;
     pecan_calibration_data(:,1));
 
 % define excludedPoints
-excludedPoints = excludedata(xData,yData,'indices', 46 );
+excludedPoints = excludedata(xData,yData,'indices', [27 46 55 56] );
 
 % redefine data vectors
 xData = xData(~excludedPoints);
@@ -107,7 +107,7 @@ set(ax,'FontSize',fontsize);
 view(ax,[115.440021713069 24.4095077862583]);
 
 % define position vector
-Position = [300, 150, 1100, 750];
+Position = [300, 150, 1250, 750];
 
 % set size
 set(fig, 'Position',  Position)
@@ -115,14 +115,18 @@ set(fig, 'Position',  Position)
 % axis labels
 xlabel('$e_0$','FontSize',fontsize)
 ylabel('$e_1$','FontSize',fontsize)
-zlabel('$\displaystyle\frac{A_{poc}}{A_{prc}}$','FontSize',fontsize)
+zlabel = zlabel('$\widetilde{\Gamma}_{3}(e_0,e_1)$','FontSize',fontsize,'rotation',0);
+
+zlabel.Position(2) = zlabel.Position(2)-0.015;
+
+ax.OuterPosition = [0.06 0.06 0.88 0.88];
+
+drawnow;
 
 % set x and y lims
 xlim([min(Xgrid(:)) max(Xgrid(:))])
 ylim([min(Ygrid(:)) max(Ygrid(:))])
 
-% title
-title('$\widetilde{\Gamma}_{3}(e_0,e_1)$','FontSize',fontsize)
 
 % set background to white
 set(gcf,'color','white')
