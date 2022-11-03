@@ -24,7 +24,7 @@ load(fullfile(projectPath,'Calibration\Pecan_Calibration_Data\PMC_Data.mat'),'pe
 %#ok<*UNRCH>
 
 % set print flag
-printFlag = false;
+printFlag = flag;
 
 % set debug flag
 debugFlag = false;
@@ -65,7 +65,7 @@ stdcs = std(pecan_method_comp(:,3));
 
 fontsize = 26;
 tikfontsize = 20;
-Position = [300, 150, 750, 750];
+Position = [264   189   821   750];
 
 % set default interpreter
 set(groot,'defaultAxesTickLabelInterpreter','latex');  
@@ -81,7 +81,7 @@ colororder(linspecer(3));
 bar(binRange,[hcbb;hcda;hccs]')
 ax = gca;
 ax.FontSize = tikfontsize; 
-title('Histogram comparison for different methods','FontSize',fontsize)
+% title('Histogram comparison for different methods','FontSize',fontsize)
 xlabel('Percentage estimate','FontSize',fontsize)
 ylabel('Number of datapoints','FontSize',fontsize)
 legend('bounding box','direct area','calib surf','FontSize',fontsize,'Location','NorthWest')
@@ -126,7 +126,7 @@ ax = gca;
 ax.FontSize = tikfontsize; 
 
 % plot cdfs
-title('CDFs for different methods','FontSize',fontsize)
+% title('CDFs for different methods','FontSize',fontsize)
 xlabel('Percentage estimate','FontSize',fontsize)
 ylabel('CDF at val','FontSize',fontsize)
 legend('bounding box','direct area','calib surf','FontSize',fontsize,'Location','NorthWest')

@@ -20,7 +20,7 @@ workspace;  % Make sure the workspace panel is showing.
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = fullfile(projectPath,'Pecan_Data_Master\Pecan_Data-20220526_145147');
+data_path = fullfile(projectPath,'DataProcessing\Pecan_Data_Master\Pecan_Data-20220526_145147');
 data_folder = 'Pecan_Data-20220526_145147';
 clear('textprogressbar'); % clear persistent vars in textprogressbar
 
@@ -623,7 +623,7 @@ textprogressbar('terminated');
 
 %% MATLAB Closeout Tasks
 
-save(fullfile(projectPath,'Pecan_Data_Master\DataStatus.mat'),'ver_summary_struct');
+save(fullfile(projectPath,'DataProcessing\Pecan_Data_Master\DataStatus.mat'),'ver_summary_struct');
 
 clearvars -except ver_summary_struct
 workspace;  % Make sure the workspace panel is showing.

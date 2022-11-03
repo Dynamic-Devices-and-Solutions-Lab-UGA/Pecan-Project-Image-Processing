@@ -26,6 +26,9 @@ load(data_path)
 angleFix = [15,30,45];
 materialFix = {'Steel','DurableResin'};
 
+% do we want to save data?
+saveFlag = 1;
+
 % combinations
 % [angleFix, materialFix]
 combs = [...
@@ -34,7 +37,7 @@ combs = [...
     3 1;...
     2 2];
 
-coordSys = 'MH';
+coordSys = 'VE';
 
 opts1.type = 'P';
 opts1.coordSys = coordSys;
@@ -52,13 +55,12 @@ for i = 1:size(combs,1)
     nameShell = fullfile(projectPath,'DataPostProcessing','LowessFits',sprintf([coordSys,'ShellabilityFit_%.f_%s.mat'],angleFix(combs(i,1)),materialFix{combs(i,2)}));
 
     % save variables
-    save(namePMI,'var_outIntegrity','PecanMeatIntegrity_sfit','gIntegrity')
-    save(nameShell,'var_outShellability','PecanShellability_sfit','gShellability')
+    if saveFlag
+        save(namePMI,'var_outIntegrity','PecanMeatIntegrity_sfit','gIntegrity')
+        save(nameShell,'var_outShellability','PecanShellability_sfit','gShellability')
+    end
 end
 
-keyboard
-
-clear;
 
 %---- END MAIN SCRIPT ----%
 
@@ -189,7 +191,9 @@ if ~param.coordSys
     opts.Robust = 'Bisquare';
     opts.Span = 0.75;
 else
-    opts.Span = 0.75;
+    opts.Robust = 'LAR';
+    opts.Span = 0.85;
+    % opts.Span = 0.5;
 end
 opts.Weights = weights;
 
@@ -197,7 +201,7 @@ opts.Weights = weights;
 [fitresult, gof] = fit([xData,yData],zData,ft,opts);
 end
 
-function [V,E] = coordTrans(M,H)
+function [V,E] = coordTrans(H,M)
 
 % apply quadratic transfrom to get from mass-height coords to 
 % velocity-energy coordinates

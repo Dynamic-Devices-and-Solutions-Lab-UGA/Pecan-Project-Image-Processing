@@ -86,12 +86,12 @@ for frame_index = 1:frame_final
     
     % plot force data from t = 0 to 2*t_point, where t_point is the time of
     % the data point we're plotting
-    plot(t(1:(2*frame_index)),force((1+shift(i)):(2*frame_index+shift(i))))
+    plot(t(1:(2*frame_index)),force((1+shift(i)):(2*frame_index+shift(i))),'k','LineWidth',1)
     
     xlim([0 t(2*frame_index)])
     xlabel('Time [ms]','FontSize',Fontsize)
     ylabel('Force [g]','FontSize',Fontsize)
-    title('Force vs. Time during pecan impact','FontSize',Fontsize)
+    % title('Force vs. Time during pecan impact','FontSize',Fontsize)
 
     % set background to white
     set(gcf,'color','white')

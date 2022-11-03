@@ -23,10 +23,10 @@ commandwindow();
 %% Post-Initialize MATLAB
 
 % set path of where data is located
-data_path = fullfile(projectPath,'Pecan_Data_Master')';
+data_path = fullfile(projectPath,'DataProcessing\Pecan_Data_Master')';
 
 % load in info about valid files
-load(fullfile(projectPath,'Pecan_Data_Master\DataStatus.mat'),'ver_summary_struct')
+load(fullfile(projectPath,'DataProcessing\Pecan_Data_Master\DataStatus.mat'),'ver_summary_struct')
 
 %% load in info from ver_summary_struct
 
@@ -299,7 +299,7 @@ textprogressbar('terminated');
 %% finalization
 
 % save data structure
-save(fullfile(data_path,'pecan_data_struct.mat'),'pecan_data_struct')
+% save(fullfile(data_path,'pecan_data_struct.mat'),'pecan_data_struct')
 clearvars -except pecan_data_struct; % Clear variables
 clc;  % Clear command window.
 workspace;  % Make sure the workspace panel is showing.

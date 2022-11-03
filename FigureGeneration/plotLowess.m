@@ -25,10 +25,13 @@ dataFolder = fullfile(projectPath,'DataPostProcessing','LowessFits');
 %% File variables
 
 % print figure
-printFlag = true;
+printFlag = 0;
 
 % choose which file to plot 1-4: integrity, 5-8: shellability
-ind = 1;
+ind = 12;
+
+% choose whether to plot 'pcolor' or 'surf'
+datavizType = 'surf';
 
 %% Load in data
 
@@ -41,22 +44,23 @@ load(fullfile(files(1).folder,files(ind).name));
 %% view angle
 
 % generated manually
-viewAngles = [-34.1288536255679 30.9043700640833;...
-                115.440021713069 24.4095077862583;...
-                115.440021713069 24.4095077862583;...
-                486.85652692134 34.1222883024068;...
-                -19.5594519770671 28.0875904945666;...
-                -37.2639353488214 24.4050391317879;...
-                17.3104267471923 23.7514723989413;...
-                -48.5107342747924 32.1831151866884;...
-                -33.3787807568528 24.6108019546176;...
-                129.180414986578 27.6422259172948;...
-                139.559789812354 39.4310965850893;...
-                140.475626696794 41.452046201464;...
-                -57.9347654528694 37.4200863794762;...
-                -14.299063118302 38.0837968824855;...
-                -48.0320047027382 35.0523731741957;...
-                -15.3675249755048 37.073322646788];
+% viewAngles = [-34.1288536255679 30.9043700640833;...
+%                 115.440021713069 24.4095077862583;...
+%                 115.440021713069 24.4095077862583;...
+%                 486.85652692134 34.1222883024068;...
+%                 -19.5594519770671 28.0875904945666;...
+%                 -37.2639353488214 24.4050391317879;...
+%                 17.3104267471923 23.7514723989413;...
+%                 -48.5107342747924 32.1831151866884;...
+%                 -33.3787807568528 24.6108019546176;...
+%                 153.8077 33.2462;...
+%                 139.559789812354 39.4310965850893;...
+%                 140.475626696794 41.452046201464;...
+%                 -57.9347654528694 37.4200863794762;...
+%                 -14.299063118302 38.0837968824855;...
+%                 -48.0320047027382 35.0523731741957;...
+%                 -15.3675249755048 37.073322646788];
+viewAngles = ones(16,1)*[115.440021713069 24.4095077862583];
 
 %% Labels
 
@@ -82,22 +86,22 @@ titles = {'$M-H$ Domain Lowess Fits: $\phi = 15^{\circ}$, Material = Steel',...
             '$V-E$ Domain Lowess Fits: $\phi = 30^{\circ}$, Material = Steel',...
             '$V-E$ Domain Lowess Fits: $\phi = 45^{\circ}$, Material = Steel'};
 
-outfiles = {'MHIntegrity_Phi15_MaterialSteel.pdf',...
-            'MHIntegrity_Phi30_MaterialDurableResin.pdf',...
-            'MHIntegrity_Phi30_MaterialSteel.pdf',...
-            'MHIntegrity_Phi45_MaterialSteel.pdf',...
-            'MHShellability_Phi15_MaterialSteel.pdf',...
-            'MHShellability_Phi30_MaterialDurableResin.pdf',...
-            'MHShellability_Phi30_MaterialSteel.pdf',...
-            'MHShellability_Phi45_MaterialSteel.pdf',...
-            'VEIntegrity_Phi15_MaterialSteel.pdf',...
-            'VEIntegrity_Phi30_MaterialDurableResin.pdf',...
-            'VEIntegrity_Phi30_MaterialSteel.pdf',...
-            'VEIntegrity_Phi45_MaterialSteel.pdf',...
-            'VEShellability_Phi15_MaterialSteel.pdf',...
-            'VEShellability_Phi30_MaterialDurableResin.pdf',...
-            'VEShellability_Phi30_MaterialSteel.pdf',...
-            'VEShellability_Phi45_MaterialSteel.pdf'};
+outfiles = {'MHIntegrity_Phi15_MaterialSteel',...
+            'MHIntegrity_Phi30_MaterialDurableResin',...
+            'MHIntegrity_Phi30_MaterialSteel',...
+            'MHIntegrity_Phi45_MaterialSteel',...
+            'MHShellability_Phi15_MaterialSteel',...
+            'MHShellability_Phi30_MaterialDurableResin',...
+            'MHShellability_Phi30_MaterialSteel',...
+            'MHShellability_Phi45_MaterialSteel',...
+            'VEIntegrity_Phi15_MaterialSteel',...
+            'VEIntegrity_Phi30_MaterialDurableResin',...
+            'VEIntegrity_Phi30_MaterialSteel',...
+            'VEIntegrity_Phi45_MaterialSteel',...
+            'VEShellability_Phi15_MaterialSteel',...
+            'VEShellability_Phi30_MaterialDurableResin',...
+            'VEShellability_Phi30_MaterialSteel',...
+            'VEShellability_Phi45_MaterialSteel'};
 
 xlabels = {'Mass [kg]','Mass [kg]','Mass [kg]','Mass [kg]','Mass [kg]','Mass [kg]','Mass [kg]','Mass [kg]',...
     'Energy [J]','Energy [J]','Energy [J]','Energy [J]','Energy [J]','Energy [J]','Energy [J]','Energy [J]'};
@@ -129,8 +133,16 @@ domPad = 0.95;
 nPoints = 100;
 
 % x and y vectors of spacing
-xVec = linspace(min(xData)*domPad,max(xData)/domPad,nPoints);
-yVec = linspace(min(yData)*domPad,max(yData)/domPad,nPoints);
+% xVec = linspace(min(xData)*domPad,max(xData)/domPad,nPoints);
+% yVec = linspace(min(yData)*domPad,max(yData)/domPad,nPoints);
+
+if ismember(ind,1:8)
+    xVec = linspace(0.1,1.1,nPoints);
+    yVec = linspace(0.1,2.5,nPoints);
+else
+    xVec = linspace(0.15,22,nPoints);
+    yVec = linspace(1.5,7,nPoints);
+end
 
 % create meshgrid
 [Xgrid,Ygrid] = meshgrid(xVec,yVec);
@@ -153,7 +165,7 @@ Zvals = reshape(Zvals,nPoints,nPoints);
 % plot initialization
 %
 % set font size
-fontsize = 26;
+fontsize = 20;
 
 % set default interpreter
 set(groot,'defaultAxesTickLabelInterpreter','latex');  
@@ -167,26 +179,40 @@ fig = figure;
 % Create axes object
 ax = axes('Parent',fig);
 
+Zvals(Zvals>100) = 100;
+Zvals(Zvals<0) = 0;
+
 % plot calib surf fit
-s = surf(Xgrid,Ygrid,Zvals,'FaceColor','interp','FaceLighting','gouraud');
+switch datavizType
+    case 'surf'
+        s = surf(Xgrid,Ygrid,Zvals,'FaceColor','interp','FaceLighting','gouraud');
+    case 'pcolor'
+        s = pcolor(Xgrid,Ygrid,Zvals);
+end
 
 % turn off edges
 s.EdgeColor = 'none';
 
 % use Cynthia Brewer's research to make a colormap for the surface fit
-colormap(linspecer);
+colormap(ax,linspecer);
 
 % set hold to on
 hold(ax,'on');
 
 % plot experimental data
-scatter3(xData,yData,zData,'Marker','.','SizeData',300,'MarkerEdgeColor','k','MarkerFaceColor','k')
+
+switch datavizType
+    case 'surf'
+        scatter3(xData,yData,zData,'Marker','.','SizeData',300,'MarkerEdgeColor','k','MarkerFaceColor','k')
+    case 'pcolor'
+        scatter(xData,yData,'Marker','.','SizeData',300,'MarkerEdgeColor','k','MarkerFaceColor','k')
+end
 
 % set axis fontsize
 set(ax,'FontSize',fontsize);
 
 % set viewing angle
-view(ax,viewAngles(ind,:));
+% view(ax,viewAngles(ind,:));
 
 % define position vector
 Position = [300, 150, 1100, 750];
@@ -197,20 +223,42 @@ set(fig, 'Position',  Position)
 % axis labels
 xlabel(xlabels{ind},'FontSize',fontsize)
 ylabel(ylabels{ind},'FontSize',fontsize)
-zlabel = zlabel(zlabels{ind},'FontSize',fontsize,'rotation',0);
-
-zlabel.Position(2) = zlabel.Position(2)+0.6;
-zlabel.Position(1) = zlabel.Position(1)+0.2;
+zlabel = zlabel(zlabels{ind},'FontSize',fontsize);
 
 ax.OuterPosition = [0.2 0.2 0.8 0.8];
 
 % set lims
-xlim([min(Xgrid(:)) max(Xgrid(:))])
-ylim([min(Ygrid(:)) max(Ygrid(:))])
-zlim([0 110])
+if ismember(ind,1:8)
+    xlim([0.1 1.1])
+    ylim([0.1 2.5])
+else
+    xlim([0.15 22])
+    ylim([1.5 7])
+end
+
+% zlabel.Position(2) = zlabel.Position(2);
+% zlabel.Position(1) = zlabel.Position(1)+1.2;
 
 % rescale colormap based off of zlims
-caxis(gca,[0 110]);
+clim(gca,[0 100]);
+
+cb = colorbar;
+cb.Label.FontSize = fontsize;
+cb.Label.Interpreter = 'latex';
+cb.TickLabelInterpreter = 'latex';
+cb.Label.String = zlabels{ind};
+
+shading interp
+
+switch datavizType
+    case 'pcolor'
+        view([90 -90])
+    case 'surf'
+        if ismember(ind,9:12)
+            view([0 -1 0])
+        end
+end
+
 
 % title
 % title(titles{ind},'FontSize',fontsize)
@@ -222,12 +270,12 @@ set(gcf,'color','white')
 hold(ax,'off');
 
 if printFlag
-    export_fig(gcf,fullfile(figurePath,outfiles{ind}))
+    export_fig(gcf,fullfile(figurePath,[outfiles{ind},datavizType,'.pdf']))
     close all;
 end
 
 %% Closeout
 
-clear; % Clear variables
-clc;  % Clear command window.
-workspace;  % Make sure the workspace panel is showing.
+% clear; % Clear variables
+% clc;  % Clear command window.
+% workspace;  % Make sure the workspace panel is showing.

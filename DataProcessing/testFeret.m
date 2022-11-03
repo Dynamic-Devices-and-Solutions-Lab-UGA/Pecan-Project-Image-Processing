@@ -1,9 +1,13 @@
+load('DataStatus.mat')
+pre_crack_file = fullfile(ver_summary_struct(18).folder,ver_summary_struct(18).filename);
+post_crack_file = fullfile(ver_summary_struct(20).folder,ver_summary_struct(20).filename);
+
 [pre_crack_area,pre_crack_pec_length,pre_crack_pec_width,~,pre_crack_bw,pre_crack_ecc,pre_crack_ext] = ...
                 pecan_property_get(pre_crack_file);
 
 [post_crack_area,~,~,post_crack_bounding_box,post_crack_bw,~,~]= pecan_property_get(post_crack_file);
 
-s = regionprops(pre_crack_bw,'ConvexArea','BoundingBox','Eccentricity','Extent','MaxFeretProperties');
+s = regionprops(pre_crack_bw,'ConvexArea','BoundingBox','Eccentricity','Extent','MaxFeretProperties','MinFeretProperties');
 
 centerx = mean(s.MaxFeretCoordinates(:,1));
 centery = mean(s.MaxFeretCoordinates(:,2));
@@ -17,10 +21,15 @@ ycoords = coords(:,1);
 xcoords_r = zeros(size(xcoords));
 ycoords_r = zeros(size(ycoords));
 
-xcoordsFeret = s.MaxFeretCoordinates(:,1);
-ycoordsFeret = s.MaxFeretCoordinates(:,2);
-xcoordsFeret_r = zeros(2,1);
-ycoordsFeret_r = zeros(2,1);
+xcoordsFeretMax = s.MaxFeretCoordinates(:,1);
+ycoordsFeretMax = s.MaxFeretCoordinates(:,2);
+xcoordsFeretMax_r = zeros(2,1);
+ycoordsFeretMax_r = zeros(2,1);
+
+xcoordsFeretMin = s.MinFeretCoordinates(:,1);
+ycoordsFeretMin = s.MinFeretCoordinates(:,2);
+xcoordsFeretMin_r = zeros(2,1);
+ycoordsFeretMin_r = zeros(2,1);
 
 Angle = s.MaxFeretAngle;
 
@@ -32,8 +41,11 @@ for i = 1:size(xcoords,1)
 end
 
 for i = 1:2
-    xcoordsFeret_r(i) = ((xcoordsFeret(i)-centerx)*cosd(Angle)-((centery-ycoordsFeret(i))*sind(Angle)))+centerx;
-    ycoordsFeret_r(i) = centery-((centery-ycoordsFeret(i))*cosd(Angle)+((xcoordsFeret(i)-centerx)*sind(Angle)));
+    xcoordsFeretMax_r(i) = ((xcoordsFeretMax(i)-centerx)*cosd(Angle)-((centery-ycoordsFeretMax(i))*sind(Angle)))+centerx;
+    ycoordsFeretMax_r(i) = centery-((centery-ycoordsFeretMax(i))*cosd(Angle)+((xcoordsFeretMax(i)-centerx)*sind(Angle)));
+
+    xcoordsFeretMin_r(i) = ((xcoordsFeretMin(i)-centerx)*cosd(Angle)-((centery-ycoordsFeretMin(i))*sind(Angle)))+centerx;
+    ycoordsFeretMin_r(i) = centery-((centery-ycoordsFeretMin(i))*cosd(Angle)+((xcoordsFeretMin(i)-centerx)*sind(Angle)));
 end
 
 %plot(xcoords,ycoords)
@@ -41,16 +53,17 @@ hold on
 plot(xcoords_r,ycoords_r)
 
 %plot(xcoordsFeret,ycoordsFeret)
-plot(xcoordsFeret_r,ycoordsFeret_r)
+plot(xcoordsFeretMax_r,ycoordsFeretMax_r)
+plot(xcoordsFeretMin_r,ycoordsFeretMin_r)
 
 % find nearest intersection with curve
-intersection1 = dsearchn([xcoords_r,ycoords_r],[xcoordsFeret_r(1);ycoordsFeret_r(1)]');
-intersection2 = dsearchn([xcoords_r,ycoords_r],[xcoordsFeret_r(2);ycoordsFeret_r(2)]');
+intersection1 = dsearchn([xcoords_r,ycoords_r],[xcoordsFeretMax_r(1);ycoordsFeretMax_r(1)]');
+intersection2 = dsearchn([xcoords_r,ycoords_r],[xcoordsFeretMax_r(2);ycoordsFeretMax_r(2)]');
 
 plot(xcoords_r(intersection1),ycoords_r(intersection1),'ro')
 plot(xcoords_r(intersection2),ycoords_r(intersection2),'ro')
 
-f2 = (ycoords_r-ycoordsFeret_r(1)).^2+ycoordsFeret_r(1);
+f2 = (ycoords_r-ycoordsFeretMax_r(1)).^2+ycoordsFeretMax_r(1);
 f3 = f2(intersection2:intersection1);
 
 
